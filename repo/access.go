@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"database/sql"
@@ -7,13 +7,7 @@ import (
 )
 
 // CheckExtendedAccess - checks if user has extended control of tacplus
-func CheckExtendedAccess(user string) string {
-	db, err := sql.Open("postgres", dbconf())
-	if err != nil {
-		log.Error(err)
-	}
-	defer db.Close()
-
+func CheckExtendedAccess(db *sql.DB, user string) string {
 	chkRole, err := db.Prepare("select exists (select role from extaccess where uid in (select uid from usr where username=$1))")
 	if err != nil {
 		log.Error(err)

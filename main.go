@@ -3,11 +3,11 @@ package main
 import (
 	"net/http"
 	"os"
+	"tac-gateway/database"
 	"tac-gateway/handler"
 	"tac-gateway/options"
 
 	"github.com/gorilla/mux"
-	"github.com/justinas/alice"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -29,7 +29,7 @@ func main() {
 		log.Fatalf("loading options failed: %v", err)
 	}
 
-	db := db.dbconf()
+	db := database.Open(appOptions.DbHost, appOptions.DbName, appOptions.DbName, appOptions.DbPassword)
 
 	g, err := handler.NewGateway(appOptions, db)
 	if err != nil {
@@ -40,7 +40,9 @@ func main() {
 	mx.HandleFunc("/", g.AppInfo)
 	mx.HandleFunc("/login", g.Login)
 	mx.HandleFunc("/logout", g.Logout)
-	mx.HandleFunc("/users/", alice.New(g.CheckExtendedAccess).Then(g.ShowUsers))
+	mx.HandleFunc("/users/", g.ShowUsers)
+
+	// alice.New(g.CheckExtendedAccess).Then(g.ShowUsers))
 
 	http.Handle("/", mx)
 
