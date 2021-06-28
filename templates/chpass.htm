@@ -1,0 +1,20 @@
+	    <h4 class="test-header">Смена пароля</h4>
+	    <div class="test-body">
+		<!-- 16 -->
+                <p>Введите новый пароль:</p>
+                <form action="/passwd/" method="post" class="align-left">
+                    <input id="password" type="password" class="input" name="pass1"/><br>
+                    Подтвердите пароль:<br>
+                    <input id="password2" type="password" class="input" name="pass2" />
+                    <p>Пароль должен содержать не менее 9 символов. Приблизительное время подбора пароля на современной видеокарте: <span id="time">less than one second</span></p>
+            <!--</span>-->
+                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	            <script src="assets/jquery.pwdstr-1.0.source.js"></script>
+		    <script>$('#password').pwdstr('#time');</script>
+                    <p>Не используйте словарные слова (имена реальных или вымышленных людей, названия географических объектов и т.д.), не используйте слова русского языка, написанные в латинской раскладке. Если используете заглавную букву (буквы) - не ставьте ее первой, если используете цифру и/или спецсимвол - не ставьте их в конец.</p>
+                    <br>
+		    <div class="form-actions align-left">
+                        <button type="submit" class="button is-info align-left">Сменить</button>
+                    </div>
+		</form>
+            </div>

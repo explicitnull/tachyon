@@ -1,0 +1,10 @@
+            <h2 class="test-header">Свойства пользователя "{{.Name}}"</h2>
+		<div class="notice is-success" role="status">Изменения сохранены</div>
+            <div class="test-body full">
+	    <p>Текущее подразделение: {{.Subdiv}} </p>
+	    <p>Текущие права доступа: {{.Prm}} </p>
+	    <p>Текущий e-mail: {{.Mail}} </p>
+	    <p>Текущий cтатус: {{.ActiveSt}} </p>
+	    <p><a href="/edituser/{{.Id}}/" class="button is-info" role="button">Я передумал, изменить еще раз</a> </p>
+            </div>
+

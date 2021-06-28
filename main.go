@@ -44,6 +44,9 @@ func main() {
 	r.HandleFunc("/users/", g.ShowUsers)
 
 	r.Use(middleware.CheckCookie)
+
+	// TODO: move serving assets to standalone proxy like nginx
+	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	http.Handle("/", r)
 
 	err = http.ListenAndServe(":8080", nil)

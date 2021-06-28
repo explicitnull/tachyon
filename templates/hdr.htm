@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Access Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="//fonts.googleapis.com/css?family=Droid+Sans:400,700" media="screen" rel="stylesheet" type="text/css">
+    <link href="/assets/toolkit.min.css" rel="stylesheet">
+    <link href="/assets/style.css" rel="stylesheet">
+    <link href="/assets/ui.css" rel="stylesheet" type="text/css">
+    <script>
+        // Set RTL before scripts load
+        if (location.search.indexOf('rtl=1') >= 0) {
+            document.documentElement.setAttribute('dir', 'rtl');
+        }
+    </script>
+    <script src="assets/toolkit.min.js"></script>
+    <script>
+        Toolkit.debug = true;
+        Toolkit.messages.loading = 'Hold on just a second...';
+        Toolkit.messages.error = 'Something terrible has happened!';
+    </script>
+</head>
+<body>
+<header id="head" class="test-bar clear-fix">
+        <div class="bar-right">Вы вошли как <b>{{.Name}}</b> <a href="/logout/" style="color: #ffffff">[Выйти]</a></div>
+</header>
+    <div id="skeleton" class="body">
+        <div class="test-demo">
+            <div class="test-body full">
+                <div class="button-group round button-group--justified" role="toolbar">
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/passwd/'" {{.Item1}}>Изменить пароль</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/equipment/'" {{.Item2}}>Оборудование</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/lockout/'" {{.Item3}}>Антибрутфорс</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/subdiv/'" {{.Item4}}>Подразделения</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/users/'" {{.Item5}}>Пользователи</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/permissions/'" {{.Item6}}>Права доступа</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/auth/'" {{.Item7}}>Аутентификация</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/acct/'" {{.Item8}}>Аккаунтинг</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/log/'" {{.Item9}}>Лог</button>
+					<button type="button" class="button" role="button" onclick="javascript:location.href='/adm/'" {{.Item10}}>Управление комплексом</button>
+                </div>
+            </div>
+<!--<div id="skeleton" class="body">
+        <div class="test-demo"> -->
+	<!--
+            <div class="test-body">
+                <div class="button-group button-group" role="toolbar">
+                    <a href="https://ams.ip.rt.ru/passwd" class="button" role="button">Смена пароля</a>
+                    <a href="https://ams.ip.rt.ru/equipment" class="button" role="button">Оборудование</a>
+                    <a href="/lockout" class="button" role="button">Антибрутфорс</a>
+                    <a href="/accounts" class="button" role="button">Учетные записи</a>
+                    <a href="/permissions" class="button" role="button">Права доступа</a>
+                    <a href="/auth" class="button" role="button">Аутентификация</a>
+                    <a href="/acct" class="button" role="button">Аккаунтинг</a>
+		    <a href="/extacc" class="button" role="button">Настройки системы</a>
+                </div>
+            </div>
+	    -->

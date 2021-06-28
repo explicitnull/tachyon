@@ -1,0 +1,11 @@
+--2016-06-11 19:50:20--  http://static.tumblr.com/silmimt/wRilyhq0t/story_box_middle.png
+Resolving static.tumblr.com... 54.192.184.102, 54.192.184.186, 54.192.184.17, ...
+Connecting to static.tumblr.com|54.192.184.102|:80... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 29988 (29K) [image/png]
+Saving to: ‘story_box_middle.png’
+
+     0K .......... .......... .........                       100%  539K=0.05s
+
+2016-06-11 19:50:20 (539 KB/s) - ‘story_box_middle.png’ saved [29988/29988]
+

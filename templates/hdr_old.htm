@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Access Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="//fonts.googleapis.com/css?family=Droid+Sans:400,700" media="screen" rel="stylesheet" type="text/css">
+    <link href="/assets/toolkit.min.css" rel="stylesheet">
+    <link href="/assets/style.css" rel="stylesheet">
+    <link href="/assets/ui.css" rel="stylesheet" type="text/css">
+    <script>
+        // Set RTL before scripts load
+        if (location.search.indexOf('rtl=1') >= 0) {
+            document.documentElement.setAttribute('dir', 'rtl');
+        }
+    </script>
+    <script src="assets/toolkit.min.js"></script>
+    <script>
+        Toolkit.debug = true;
+        Toolkit.messages.loading = 'Hold on just a second...';
+        Toolkit.messages.error = 'Something terrible has happened!';
+    </script>
+</head>
+<body>
+    <div id="skeleton" class="body">
+        <div class="test-demo">
+            <div class="test-body">
+                <div class="button-group" role="toolbar">
+                    <a href="/passwd" class="button" role="button">Смена пароля</a>
+                    <a href="/equipment" class="button" role="button">Оборудование</a>
+                    <a href="/lockout" class="button" role="button">Антибрутфорс</a>
+                    <a href="/accounts" class="button" role="button">Учетные записи</a>
+                    <a href="/permissions" class="button" role="button">Права доступа</a>
+                    <a href="/auth" class="button" role="button">Аутентификация</a>
+                    <a href="/acct" class="button" role="button">Аккаунтинг</a>
+		    <a href="/extacc" class="button" role="button">Настройки системы</a>
+                </div>
+            </div>

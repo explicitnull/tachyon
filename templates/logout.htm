@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Access Management</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link href="//fonts.googleapis.com/css?family=Droid+Sans:400,700" media="screen" rel="stylesheet" type="text/css">
+    <link href="/assets/toolkit.min.css" rel="stylesheet">
+    <link href="/assets/style.css" rel="stylesheet">
+    <link href="/assets/ui.css" rel="stylesheet" type="text/css">
+    <script>
+        // Set RTL before scripts load
+        if (location.search.indexOf('rtl=1') >= 0) {
+            document.documentElement.setAttribute('dir', 'rtl');
+        }
+    </script>
+    <script src="assets/toolkit.min.js"></script>
+    <script>
+        Toolkit.debug = true;
+        Toolkit.messages.loading = 'Hold on just a second...';
+        Toolkit.messages.error = 'Something terrible has happened!';
+    </script>
+</head>
+<body>
+    <div id="skeleton" class="body">
+        <div class="test-demo">
+	<div class="notice is-info" role="status">Ваша сессия завершена</div>
+            <h2 class="test-header" style="text-align: center">IPBB access control</h2>
+
+            <div class="test-body full">
+                <form action="/login/" class="form--horizontal" method="post">
+                    <fieldset class="no-legend">
+                        <ol class="fields">
+                            <li>
+                                <label class="field-label col span-4">Логин TACACS+</label>
+                                <div class="field-col col span-8">
+                                    <input type="text" class="input" value="" name="username" autofocus>
+				    <div class="field-help"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <label class="field-label col span-4">Пароль</label>
+                                <div class="field-col col span-8">
+                                    <input type="password" class="input" value="" name="password">
+				    <div class="field-help"></div>
+                                </div>
+                            </li>
+                        </ol>
+                    </fieldset>
+                    <div class="form-actions">
+                        <button type="submit" class="button is-info">Войти</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+	</div>
+</body>
+</html>
+
