@@ -39,8 +39,9 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", g.AppInfo)
-	r.HandleFunc("/login", g.Login)
-	r.HandleFunc("/logout", g.Logout)
+	r.HandleFunc("/login/", g.Login).Methods("GET")
+	r.HandleFunc("/login/", g.LoginDo).Methods("POST")
+	r.HandleFunc("/logout/", g.Logout)
 	r.HandleFunc("/users/", g.ShowUsers)
 
 	r.Use(middleware.CheckCookie)
