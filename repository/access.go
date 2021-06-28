@@ -1,4 +1,4 @@
-package database
+package repository
 
 import (
 	"database/sql"
@@ -6,9 +6,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const q = `SELECT exists (SELECT role FROM extaccess WHERE uid IN (SELECT uid FROM usr WHERE username=$1))`
+
 // CheckExtendedAccess - checks if user has extended control of tacplus
 func CheckExtendedAccess(db *sql.DB, user string) string {
-	chkRole, err := db.Prepare("select exists (select role from extaccess where uid in (select uid from usr where username=$1))")
+	chkRole, err := db.Prepare(q)
 	if err != nil {
 		log.Error(err)
 	}
@@ -21,7 +23,7 @@ func CheckExtendedAccess(db *sql.DB, user string) string {
 	}
 
 	if rExists {
-		getRole, err := db.Prepare("select role from extaccess where uid in (select uid from usr where username=$1)")
+		getRole, err := db.Prepare("SELECT role FROM extaccess WHERE uid IN (SELECT uid FROM usr WHERE username=$1)")
 		if err != nil {
 			log.Error(err)
 		}

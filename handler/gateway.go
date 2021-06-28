@@ -2,7 +2,7 @@ package handler
 
 import (
 	"database/sql"
-	"tac-gateway/options"
+	"tachyon-web/options"
 )
 
 type Gateway struct {
@@ -14,7 +14,7 @@ type Gateway struct {
 
 func NewGateway(o *options.Options, db *sql.DB) (*Gateway, error) {
 	return &Gateway{
-		appName:    "tac-gateway",
+		appName:    "tachyon-web",
 		appVersion: "1.0.0",
 		Options:    o,
 		db:         db,

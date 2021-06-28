@@ -1,6 +1,6 @@
 package handler
 
-const tShort = "2006-01-02 15:04"
+const timeShort = "2006-01-02 15:04"
 
 type Header struct {
 	Name   string

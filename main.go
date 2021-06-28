@@ -3,15 +3,16 @@ package main
 import (
 	"net/http"
 	"os"
-	"tac-gateway/database"
-	"tac-gateway/handler"
-	"tac-gateway/options"
+	"tachyon-web/database"
+	"tachyon-web/handler"
+	"tachyon-web/middleware"
+	"tachyon-web/options"
 
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
 
-const appName = "tac-gateway"
+const appName = "tachyon-web"
 
 func init() {
 	log.SetFormatter(&log.JSONFormatter{})
@@ -36,15 +37,14 @@ func main() {
 		log.Fatalf("handler init failed: %v", err)
 	}
 
-	mx := mux.NewRouter()
-	mx.HandleFunc("/", g.AppInfo)
-	mx.HandleFunc("/login", g.Login)
-	mx.HandleFunc("/logout", g.Logout)
-	mx.HandleFunc("/users/", g.ShowUsers)
+	r := mux.NewRouter()
+	r.HandleFunc("/", g.AppInfo)
+	r.HandleFunc("/login", g.Login)
+	r.HandleFunc("/logout", g.Logout)
+	r.HandleFunc("/users/", g.ShowUsers)
 
-	// alice.New(g.CheckExtendedAccess).Then(g.ShowUsers))
-
-	http.Handle("/", mx)
+	r.Use(middleware.CheckCookie)
+	http.Handle("/", r)
 
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
