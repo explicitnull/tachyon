@@ -13,6 +13,7 @@ func GetPasswordHash(db *sql.DB, user string) (string, error) {
 	prepared, err := db.Prepare(getPasswordHash)
 	if err != nil {
 		log.Error(err)
+		return "", err
 	}
 	defer prepared.Close()
 
@@ -20,8 +21,7 @@ func GetPasswordHash(db *sql.DB, user string) (string, error) {
 	err = prepared.QueryRow(user).Scan(&hash)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			log.WithField("username", user).Warnf("username not found in database", user)
-			return "", err
+			return "", nil
 		}
 		log.Error(err)
 	}
