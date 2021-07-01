@@ -56,6 +56,7 @@ func (g *Gateway) LoginDo(w http.ResponseWriter, r *http.Request) {
 }
 
 func loginDo(username, formPassword string, db *sql.DB, r *http.Request) bool {
+	ctx := r.Context()
 	dbhash, err := repository.GetPasswordHash(db, username)
 	if err != nil {
 		log.Errorf("GetPasswordHash() failed: %v", err)
@@ -81,7 +82,10 @@ func loginDo(username, formPassword string, db *sql.DB, r *http.Request) bool {
 		return false
 	}
 
-	log.WithField("username", username).WithField("ip", r.RemoteAddr).Info("logged in")
+	log.WithField("requestID", ctx.Value("requestID")).
+		WithField("username", username).
+		WithField("ip", r.RemoteAddr).
+		Info("logged in")
 
 	return true
 }
@@ -124,3 +128,4 @@ func hashPassword(salt, password string) string {
 
 	return string(line)
 }
+

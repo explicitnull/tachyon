@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"context"
 	"html/template"
 	"net/http"
 
@@ -10,10 +11,15 @@ import (
 
 func (m *Middleware) CheckCookie(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		le := log.WithField("origin", "middleware").WithField("ip", r.RemoteAddr)
+		ctx := r.Context()
+		le := log.
+			WithField("origin", "middleware").
+			WithField("requestID", ctx.Value("requestID"))
+
 		user, ok := checkCookie(r, m.sc, le)
 		if ok {
 			le.WithField("username", user).Debugf("cookie verified")
+
 			next.ServeHTTP(w, r)
 		} else {
 			t, err := template.ParseFiles("templates/login.htm")
@@ -21,24 +27,33 @@ func (m *Middleware) CheckCookie(next http.Handler) http.Handler {
 				le.Errorf("template parsing failed: %v", err)
 				return
 			}
+
 			t.Execute(w, nil)
 		}
 	})
 }
 
-func checkCookie(r *http.Request, sc *securecookie.SecureCookie, le log.Entry) (string, bool) {
+func checkCookie(r *http.Request, sc *securecookie.SecureCookie, le *log.Entry) (string, bool) {
 	cookie, err := r.Cookie("username")
-	switch err {
-	case http.ErrNoCookie:
-	case nil:
-		value := make(map[string]string)
-		if err = sc.Decode("username", cookie.Value, &value); err == nil {
-			user := value["name"]
-			return user, true
-		}
-	default:
-		le.Error("cookie decoding failed")
+	if err != nil {
+		return "", false
 	}
 
-	return "", false
+	val := make(map[string]string)
+	err = sc.Decode("username", cookie.Value, &val)
+	if err != nil {
+		le.Error("cookie decoding failed")
+		return "", false
+	}
+
+	username := val["name"]
+	setUsernameInContext(r, username)
+
+	return username, true
+}
+
+func setUsernameInContext(r *http.Request, username string) {
+	ctx := r.Context()
+	ctx = context.WithValue(ctx, "username", username)
+	r = r.WithContext(ctx)
 }
