@@ -9,12 +9,21 @@ import (
 )
 
 func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
 	le := getLogger(r)
+
+	username := ctx.Value("username").(string)
+
+	if repository.CheckRole(le, g.db, username) == "none" {
+		le.Warn("access forbidden")
+		fmt.Fprintf(w, "access_forbidden")
+		return
+	}
 
 	sum := repository.GetUserCount(g.db)
 
 	header := Header{
-		Name: "furai", // FIXME
+		Name: ctx.Value("username").(string),
 	}
 
 	hdr, err := template.ParseFiles("templates/hdr.htm")
