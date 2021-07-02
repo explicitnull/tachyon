@@ -2,12 +2,12 @@ package handler
 
 import (
 	"bufio"
-	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
 	"os/exec"
 	"regexp"
+	"tachyon-web/repository"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -35,11 +35,7 @@ func (g *Gateway) ChangePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
-	ctx := r.Context()
-
-	le := log.
-		WithField("requestID", ctx.Value("requestID")).
-		WithField("username", ctx.Value("username"))
+	ctx, le := makeContextAndLogrusEntry(r)
 
 	r.ParseForm()
 	f1 := r.Form["pass1"]
@@ -71,13 +67,15 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	// changing password
 	username := ctx.Value("username").(string)
 
-	err := updPass(g.db, username, pass)
+	hash := makeHash(pass)
+
+	err := repository.UpdatePassword(g.db, username, hash)
 	if err != nil {
 		le.Errorf("%v", err)
 		return
 	}
 
-	le.Info("user updated password")
+	le.Info("user password updated")
 
 	/*
 		// Set flag "password changed"
@@ -95,41 +93,15 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	*/
 
 	// activating user
-	stmt, err := g.db.Prepare("update usr set act='true' where username=$1")
+	err = repository.ActivateUser(g.db, le, username)
 	if err != nil {
 		le.Errorf("%v", err)
 		return
 	}
-	defer stmt.Close()
 
-	_, err = stmt.Exec(username)
-	if err != nil {
-		le.Printf(`USER-4-ACTFAIL Error setting "active" flag for user %s\n`, username)
-		return
-	}
-
-	le.Info("user status switched to active due to password change")
+	le.Info("user status switched to active due to password update")
 
 	fmt.Fprintf(w, "<p>Пароль изменен.</p>")
-}
-
-func updPass(db *sql.DB, usr, clText string) error {
-	hash := makeHash(clText)
-
-	stmt, err := db.Prepare("UPDATE usr SET pass=$1 WHERE username=$2")
-	if err != nil {
-		log.Errorf("%v", err)
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(hash, usr)
-	if err != nil {
-		log.Errorf("%v", err)
-		return err
-	}
-
-	return err
 }
 
 func makeHash(pass string) string {

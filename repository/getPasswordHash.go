@@ -8,7 +8,7 @@ import (
 
 const getPasswordHash = `SELECT pass FROM usr WHERE username=$1`
 
-// GetPasswordHash searches and returns password hash by given username
+// GetPasswordHash searches and returns password hash for given username
 func GetPasswordHash(db *sql.DB, user string) (string, error) {
 	prepared, err := db.Prepare(getPasswordHash)
 	if err != nil {
