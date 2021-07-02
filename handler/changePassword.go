@@ -9,15 +9,12 @@ import (
 	"regexp"
 	"tachyon-web/repository"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 func (g *Gateway) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-
-	le := log.
-		WithField("requestID", ctx.Value("requestID")).
-		WithField("username", ctx.Value("username"))
+	le := getLogger(r)
 
 	header := Header{
 		Name: ctx.Value("username").(string),
@@ -35,7 +32,8 @@ func (g *Gateway) ChangePassword(w http.ResponseWriter, r *http.Request) {
 }
 
 func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
-	ctx, le := makeContextAndLogrusEntry(r)
+	ctx := r.Context()
+	le := getLogger(r)
 
 	r.ParseForm()
 	f1 := r.Form["pass1"]
@@ -67,7 +65,7 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	// changing password
 	username := ctx.Value("username").(string)
 
-	hash := makeHash(pass)
+	hash := makeHash(le, pass)
 
 	err := repository.UpdatePassword(g.db, username, hash)
 	if err != nil {
@@ -104,12 +102,12 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<p>Пароль изменен.</p>")
 }
 
-func makeHash(pass string) string {
-	/* This function generates and returns MD5 hashes for given passwords */
+/* makeHash generates MD5 hashes for given passwords */
+func makeHash(le *logrus.Entry, pass string) string {
 	cmd := exec.Command("openssl", "passwd", "-1", pass)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
-		log.Errorf("%v", err)
+		le.Errorf("%v", err)
 		return ""
 	}
 
@@ -118,7 +116,7 @@ func makeHash(pass string) string {
 
 	line, _, err := pipe.ReadLine()
 	if err != nil {
-		log.Errorf("%v", err)
+		le.Errorf("%v", err)
 		return ""
 	}
 

@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -24,7 +23,16 @@ type Header struct {
 	Item10 string
 }
 
-func makeContextAndLogrusEntry(r *http.Request) (context.Context, *logrus.Entry) {
+func getLogger(r *http.Request) *logrus.Entry {
 	ctx := r.Context()
-	return ctx, log.WithField("requestID", ctx.Value("requestID")).WithField("username", ctx.Value("username"))
+	le := log.WithField("requestID", ctx.Value("requestID")).WithField("username", ctx.Value("username"))
+
+	return le
+}
+
+func getLoggerWithoutUsername(r *http.Request) *logrus.Entry {
+	ctx := r.Context()
+	le := log.WithField("requestID", ctx.Value("requestID"))
+
+	return le
 }

@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"tachyon-web/repository"
 	"time"
-
-	log "github.com/sirupsen/logrus"
 )
 
 func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
+	le := getLogger(r)
+
 	sum := repository.GetUserCount(g.db)
 
 	header := Header{
@@ -19,13 +19,13 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 
 	hdr, err := template.ParseFiles("templates/hdr.htm")
 	if err != nil {
-		log.Errorf("template parsing failed: %v", err)
+		le.WithError(err).Error("template parsing failed")
 	}
 	hdr.Execute(w, header)
 
 	main, err := template.ParseFiles("templates/users.htm")
 	if err != nil {
-		log.Errorf("template parsing failed: %v", err)
+		le.WithError(err).Error("template parsing failed")
 	}
 	main.Execute(w, sum)
 
@@ -48,7 +48,7 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 
 		t, err := time.Parse(time.RFC3339Nano, u.CreaTime)
 		if err != nil {
-			log.WithError(err).Error("parsing time failed")
+			le.WithError(err).Error("template parsing failed")
 		}
 
 		u.CreaTimeS = t.Format(timeShort)
@@ -60,7 +60,7 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 
 	ftr, err := template.ParseFiles("templates/ftr-to-top.htm")
 	if err != nil {
-		log.Errorf("template parsing failed: %v", err)
+		le.WithError(err).Error("template parsing failed")
 	}
 	ftr.Execute(w, nil)
 }

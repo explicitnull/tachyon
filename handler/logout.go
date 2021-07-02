@@ -3,18 +3,18 @@ package handler
 import (
 	"html/template"
 	"net/http"
-
-	log "github.com/sirupsen/logrus"
 )
 
 func (g *Gateway) Logout(w http.ResponseWriter, r *http.Request) {
+	le := getLogger(r)
+
 	deleteCookie(w)
 
-	log.Info("user logged out")
-	
+	le.Info("user logged out")
+
 	t, err := template.ParseFiles("templates/logout.htm")
 	if err != nil {
-		log.Errorf("%v", err)
+		le.Errorf("%v", err)
 	}
 	t.Execute(w, nil)
 }
