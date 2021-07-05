@@ -14,6 +14,7 @@ func (m *Middleware) Log(next http.Handler) http.Handler {
 
 		log.WithField("origin", "middleware").
 			WithField("url", r.RequestURI).
+			WithField("method", r.Method).
 			WithField("ip", r.RemoteAddr).
 			WithField("requestID", requestID).
 			Info("request received")

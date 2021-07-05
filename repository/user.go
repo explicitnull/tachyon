@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql"
 
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -10,6 +11,7 @@ const (
 	getUserCount       = `SELECT COUNT(*) FROM usr`
 	getActiveUserCount = `SELECT COUNT(*) FROM usr WHERE act=true`
 	getUsers           = `SELECT u.uid, u.username, p.prm, u.mail, d.subdiv, u.created, u.act, u.pass_chd, u.created_by FROM usr u JOIN prm p ON (u.prm_id = p.prm_id) JOIN subdiv d ON (u.subdiv_id = d.l2id) ORDER BY p.prm, u.username`
+	createUserQuery    = `INSERT INTO usr(username, mail, prm_id, pass, subdiv_id, created_by) values ($1, $2, $3, $4, $5, $6)`
 )
 
 type User struct {
@@ -75,4 +77,19 @@ func GetUsers(db *sql.DB) []*User {
 	}
 
 	return res
+}
+
+func CreateUser(le *logrus.Entry, db *sql.DB, u User, permissionID, subdivisionID) error {
+	stmt, err := db.Prepare(createUserQuery)
+	if err != nil {
+		le.WithError(err).Error("preparing statement failed")
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(u.Name, u.Mail, permissionID, u.Hash, subdivisionID, u.CreaBy)
+	if err != nil {
+		le.WithError(err).Error("executing statement failed")
+		return err
+	}
 }

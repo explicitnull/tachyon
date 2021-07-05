@@ -20,7 +20,7 @@ func (g *Gateway) Login(w http.ResponseWriter, r *http.Request) {
 
 	t, err := template.ParseFiles("templates/login.htm")
 	if err != nil {
-		le.Errorf("template parsing failed: %v", err)
+		le.WithError(err).Error("template parsing failed")
 	}
 	t.Execute(w, nil)
 }

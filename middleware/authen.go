@@ -16,15 +16,15 @@ func (m *Middleware) CheckCookie(next http.Handler) http.Handler {
 			WithField("origin", "middleware").
 			WithField("requestID", ctx.Value("requestID"))
 
-		user, ok := checkCookie(r, m.sc, le)
+		username, ok := checkCookie(r, m.sc, le)
 		if ok {
-			le.WithField("username", user).Debugf("cookie verified")
+			le.WithField("username", username).Debugf("cookie verified")
 
 			next.ServeHTTP(w, r)
 		} else {
 			t, err := template.ParseFiles("templates/login.htm")
 			if err != nil {
-				le.Errorf("template parsing failed: %v", err)
+				le.WithError(err).Error("template parsing failed")
 				return
 			}
 

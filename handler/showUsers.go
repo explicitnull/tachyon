@@ -16,7 +16,7 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 
 	if repository.CheckRole(le, g.db, username) == "none" {
 		le.Warn("access forbidden")
-		fmt.Fprintf(w, "access_forbidden")
+		fmt.Fprintf(w, "access forbidden")
 		return
 	}
 
