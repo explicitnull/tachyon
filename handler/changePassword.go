@@ -114,7 +114,7 @@ func changePasswordDo(le *logrus.Entry, db *sql.DB, pass, passConfirm string, o 
 	*/
 
 	// activating user
-	err = repository.ActivateUser(db, le, username)
+	err = repository.SetUserStatus(le, username, true)
 	if err != nil {
 		le.WithError(err).Error("user activation failed")
 		return err

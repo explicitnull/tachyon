@@ -2,16 +2,19 @@ package repository
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
+	"strconv"
 
+	as "github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 )
 
-const (
-	getUserCount       = `SELECT COUNT(*) FROM usr`
-	getActiveUserCount = `SELECT COUNT(*) FROM usr WHERE act=true`
-	getUsers           = `SELECT u.uid, u.username, p.prm, u.mail, d.subdiv, u.created, u.act, u.pass_chd, u.created_by FROM usr u JOIN prm p ON (u.prm_id = p.prm_id) JOIN subdiv d ON (u.subdiv_id = d.l2id) ORDER BY p.prm, u.username`
-	createUserQuery    = `INSERT INTO usr(username, mail, prm_id, pass, subdiv_id, created_by) values ($1, $2, $3, $4, $5, $6)`
+var (
+	host      = "127.0.0.1"
+	port      = 3000
+	namespace = "tacacs"
+	set       = "users"
 )
 
 type User struct {
@@ -38,58 +41,86 @@ type UserSummary struct {
 	Active int
 }
 
+// GetPasswordHash searches for password hash of given user
+func GetPasswordHash(db *sql.DB, username string) (string, error) {
+	client, err := as.NewClient(host, port)
+	if err != nil {
+		return "", nil
+	}
+
+	var key *as.Key
+
+	skey := username
+	ikey, err := strconv.ParseInt(skey, 10, 64)
+	if err == nil {
+		key, err = as.NewKey(namespace, set, ikey)
+		panicOnError(err)
+	} else {
+		key, err = as.NewKey(namespace, set, skey)
+		panicOnError(err)
+	}
+
+	policy := as.NewPolicy()
+	rec, err := client.Get(policy, key, "pass")
+	panicOnError(err)
+
+	if rec != nil {
+		printOK("%v", rec.Bins)
+		return extractString(rec.Bins, "pass")
+
+	} else {
+		printError("record not found: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+	}
+
+	return "", nil
+}
+
+func panicOnError(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+func printOK(format string, a ...interface{}) {
+	fmt.Printf("ok: "+format+"\n", a...)
+	os.Exit(0)
+}
+
+func printError(format string, a ...interface{}) {
+	fmt.Printf("error: "+format+"\n", a...)
+	os.Exit(1)
+}
+
+func extractString(bins as.BinMap, bin string) (string, error) {
+	passI, ok := bins[bin]
+	if ok {
+		pass, ok := passI.(string)
+		if ok {
+			return pass, nil
+		}
+	}
+
+	return "", nil
+}
+
+func CreateUser(le *logrus.Entry, username, hash, mail, createdBy string, permisID, subdivID int) error {
+	return nil
+}
+
+func UpdatePassword(db *sql.DB, username, hash string) error {
+	return nil
+}
+
+func SetUserStatus(le *logrus.Entry, username string, active bool) error {
+	return nil
+}
+
 func GetUserCount(db *sql.DB) *UserSummary {
-	sum := new(UserSummary)
-
-	err := db.QueryRow(getUserCount).Scan(&sum.Total)
-	if err != nil {
-		log.Errorf("quering total users count failed: %v", err)
-		return sum
-	}
-
-	err = db.QueryRow(getActiveUserCount).Scan(&sum.Active)
-	if err != nil {
-		log.Errorf("quering active users count failed: %v", err)
-		return sum
-	}
-
-	return sum
+	return &UserSummary{}
 }
 
 func GetUsers(db *sql.DB) []*User {
 	res := make([]*User, 0)
-	rows, err := db.Query(getUsers)
-	if err != nil {
-		log.Errorf("quering all users failed: %v", err)
-		return nil
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		u := new(User)
-
-		err = rows.Scan(&u.Id, &u.Name, &u.Prm, &u.Mail, &u.Subdiv, &u.CreaTime, &u.Active, &u.PassChd, &u.CreaBy)
-		if err != nil {
-			log.WithError(err).Error("scanning sql rows failed")
-		}
-
-		res = append(res, u)
-	}
 
 	return res
-}
-
-func CreateUser(le *logrus.Entry, db *sql.DB, u User, permissionID, subdivisionID) error {
-	stmt, err := db.Prepare(createUserQuery)
-	if err != nil {
-		le.WithError(err).Error("preparing statement failed")
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(u.Name, u.Mail, permissionID, u.Hash, subdivisionID, u.CreaBy)
-	if err != nil {
-		le.WithError(err).Error("executing statement failed")
-		return err
-	}
 }

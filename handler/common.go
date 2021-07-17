@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"html/template"
 	"net/http"
 
 	"github.com/sirupsen/logrus"
@@ -35,4 +36,46 @@ func getLoggerWithoutUsername(r *http.Request) *logrus.Entry {
 	le := log.WithField("requestID", ctx.Value("requestID"))
 
 	return le
+}
+
+func executeHeaderTemplate(le *logrus.Entry, w http.ResponseWriter, username string) {
+	hdr, err := template.ParseFiles("templates/hdr.htm")
+	if err != nil {
+		le.WithError(err).Error("template parsing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	header := Header{
+		Name: username,
+	}
+
+	hdr.Execute(w, header)
+	if err != nil {
+		le.WithError(err).Error("template parsing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func executeFooterTemplate(le *logrus.Entry, w http.ResponseWriter) {
+	ftr, err := template.ParseFiles("templates/ftr.htm")
+	if err != nil {
+		le.WithError(err).Error("template parsing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	ftr.Execute(w, nil)
+	if err != nil {
+		le.WithError(err).Error("template parsing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+}
+
+func checkErr(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
 }

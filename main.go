@@ -56,8 +56,8 @@ func main() {
 	r.HandleFunc("/logout/", g.Logout)
 	r.HandleFunc("/passwd/", g.ChangePassword).Methods("GET")
 	r.HandleFunc("/passwd/", g.ChangePasswordDo).Methods("POST")
-	r.HandleFunc("/new{entity}/", g.CreateEntity).Methods("GET")
-	r.HandleFunc("/new{entity}/", g.CreateEntityDo).Methods("POST")
+	r.HandleFunc("/newuser/", g.CreateUser).Methods("GET")
+	r.HandleFunc("/new{entity}/", g.CreateUserDo).Methods("POST")
 
 	r.HandleFunc("/users/", g.ShowUsers)
 

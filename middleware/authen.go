@@ -20,6 +20,8 @@ func (m *Middleware) CheckCookie(next http.Handler) http.Handler {
 		if ok {
 			le.WithField("username", username).Debugf("cookie verified")
 
+			setUsernameInContext(r, username)
+
 			next.ServeHTTP(w, r)
 		} else {
 			t, err := template.ParseFiles("templates/login.htm")
@@ -46,10 +48,7 @@ func checkCookie(r *http.Request, sc *securecookie.SecureCookie, le *log.Entry) 
 		return "", false
 	}
 
-	username := val["name"]
-	setUsernameInContext(r, username)
-
-	return username, true
+	return val["name"], true
 }
 
 func setUsernameInContext(r *http.Request, username string) {
