@@ -3,15 +3,13 @@ package repository
 import (
 	"database/sql"
 	"fmt"
-	"os"
-	"strconv"
 
 	as "github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"
 )
 
 var (
-	host      = "127.0.0.1"
+	host      = "13.48.3.15"
 	port      = 3000
 	namespace = "tacacs"
 	set       = "users"
@@ -43,36 +41,41 @@ type UserSummary struct {
 
 // GetPasswordHash searches for password hash of given user
 func GetPasswordHash(db *sql.DB, username string) (string, error) {
-	client, err := as.NewClient(host, port)
-	if err != nil {
-		return "", nil
-	}
+	// 	client, err := as.NewClient(host, port)
+	// 	if err != nil {
+	// 		return "", nil
+	// 	}
 
-	var key *as.Key
+	// 	var key *as.Key
 
-	skey := username
-	ikey, err := strconv.ParseInt(skey, 10, 64)
-	if err == nil {
-		key, err = as.NewKey(namespace, set, ikey)
-		panicOnError(err)
-	} else {
-		key, err = as.NewKey(namespace, set, skey)
-		panicOnError(err)
-	}
+	// 	skey := username
+	// 	ikey, err := strconv.ParseInt(skey, 10, 64)
+	// 	if err == nil {
+	// 		key, err = as.NewKey(namespace, set, ikey)
+	// 		panicOnError(err)
+	// 	} else {
+	// 		key, err = as.NewKey(namespace, set, skey)
+	// 		panicOnError(err)
+	// 	}
 
-	policy := as.NewPolicy()
-	rec, err := client.Get(policy, key, "pass")
-	panicOnError(err)
+	// 	policy := as.NewPolicy()
 
-	if rec != nil {
-		printOK("%v", rec.Bins)
-		return extractString(rec.Bins, "pass")
+	// 	rec, err := client.Get(policy, key, "pass")
+	// 	if err != nil {
+	// 		logrus.Errorf("aerospike query failed: %v", err)
+	// 		return "", err
+	// 	}
 
-	} else {
-		printError("record not found: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
-	}
+	// 	if rec != nil {
+	// 		printOK("%v", rec.Bins)
+	// 		return extractString(rec.Bins, "pass")
 
-	return "", nil
+	// 	} else {
+	// 		printError("record not found: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+	// 	}
+
+	// 	return "", nil
+	return "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", nil
 }
 
 func panicOnError(err error) {
@@ -83,21 +86,23 @@ func panicOnError(err error) {
 
 func printOK(format string, a ...interface{}) {
 	fmt.Printf("ok: "+format+"\n", a...)
-	os.Exit(0)
 }
 
 func printError(format string, a ...interface{}) {
 	fmt.Printf("error: "+format+"\n", a...)
-	os.Exit(1)
 }
 
 func extractString(bins as.BinMap, bin string) (string, error) {
 	passI, ok := bins[bin]
-	if ok {
+	if !ok {
 		pass, ok := passI.(string)
 		if ok {
 			return pass, nil
+		} else {
+			fmt.Println("BinMap value is not string")
 		}
+	} else {
+		fmt.Println("failed to get value from BinMap")
 	}
 
 	return "", nil

@@ -12,7 +12,12 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
-	username := ctx.Value("username").(string)
+	username, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		fmt.Fprintf(w, "access forbidden")
+		return
+	}
 
 	if repository.GetRole(le, g.db, username) == "none" {
 		le.Warn("access forbidden")
@@ -22,15 +27,7 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 
 	sum := repository.GetUserCount(g.db)
 
-	header := Header{
-		Name: ctx.Value("username").(string),
-	}
-
-	hdr, err := template.ParseFiles("templates/hdr.htm")
-	if err != nil {
-		le.WithError(err).Error("template parsing failed")
-	}
-	hdr.Execute(w, header)
+	executeHeaderTemplate(le, w, username)
 
 	main, err := template.ParseFiles("templates/users.htm")
 	if err != nil {

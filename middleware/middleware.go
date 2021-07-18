@@ -1,6 +1,8 @@
 package middleware
 
 import (
+	"context"
+	"net/http"
 	"tachyon-web/options"
 
 	"github.com/gorilla/securecookie"
@@ -18,4 +20,10 @@ func NewMiddleware(o *options.Options, sc *securecookie.SecureCookie) (*Middlewa
 		Options: o,
 		sc:      sc,
 	}, nil
+}
+
+func setValueInContext(r *http.Request, key, value string) *http.Request {
+	ctx := r.Context()
+	ctx = context.WithValue(ctx, key, value)
+	return r.WithContext(ctx)
 }

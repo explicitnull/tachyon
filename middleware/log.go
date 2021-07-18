@@ -12,14 +12,14 @@ func (m *Middleware) Log(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requestID := generateID()
 
-		log.WithField("origin", "middleware").
+		log.
 			WithField("url", r.RequestURI).
 			WithField("method", r.Method).
 			WithField("ip", r.RemoteAddr).
 			WithField("requestID", requestID).
-			Info("request received")
+			Info("NEW INCOMING REQUEST")
 
-		setRequestIDInContext(r, requestID)
+		r = setRequestIDInContext(r, requestID)
 
 		next.ServeHTTP(w, r)
 	})
@@ -29,8 +29,8 @@ func generateID() string {
 	return uniuri.New()
 }
 
-func setRequestIDInContext(r *http.Request, requestID string) {
+func setRequestIDInContext(r *http.Request, requestID string) *http.Request {
 	ctx := r.Context()
 	ctx = context.WithValue(ctx, "requestID", requestID)
-	r = r.WithContext(ctx)
+	return r.WithContext(ctx)
 }

@@ -20,20 +20,16 @@ func (g *Gateway) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	header := Header{
-		Name: ctx.Value("username").(string),
+	username, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		fmt.Fprintf(w, "access forbidden")
+		return
 	}
 
-	// TODO: what is it?
-	if ctx.Value("username").(string) == "dzhargalov" {
-		header.Item10 = "disabled"
-	}
-
-	hdr, _ := template.ParseFiles("templates/hdr.htm")
-	hdr.Execute(w, header)
+	executeHeaderTemplate(le, w, username)
 
 	fmt.Fprintf(w, "<p>Welcome!</p>")
 
-	ftr, _ := template.ParseFiles("templates/ftr.htm")
-	ftr.Execute(w, nil)
+	executeFooterTemplate(le, w)
 }

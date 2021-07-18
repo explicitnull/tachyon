@@ -7,7 +7,6 @@ import (
 	"html/template"
 	"net/http"
 	"os/exec"
-	"strings"
 	"tachyon-web/repository"
 	"time"
 
@@ -73,14 +72,14 @@ func loginDo(le *logrus.Entry, username, formPassword string, db *sql.DB, r *htt
 		return false
 	}
 
-	hashParts := strings.Split(dbhash, "$")
-	if len(hashParts) != 3 {
-		le.Error("wrong database hash format")
-		return false
-	}
+	// hashParts := strings.Split(dbhash, "$")
+	// if len(hashParts) != 3 {
+	// 	le.Error("wrong database hash format")
+	// 	return false
+	// }
 
-	salt := hashParts[2]
-	formHash := hashPassword(le, salt, formPassword)
+	// salt := hashParts[2]
+	formHash := makeHash(le, formPassword)
 
 	if formHash != dbhash {
 		le.Warning("wrong password")

@@ -1,14 +1,13 @@
 package handler
 
 import (
-	"bufio"
-	"context"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"html/template"
 	"net/http"
-	"os/exec"
 	"regexp"
 	"tachyon-web/options"
 	"tachyon-web/repository"
@@ -17,26 +16,28 @@ import (
 )
 
 var (
-	passwordsMismatchError = errors.New("passwords mismatch")
-	badCharactersError     = errors.New("bad characters in password")
-	tooShortError          = errors.New("too short password")
+	errPasswordsMismatch = errors.New("passwords mismatch")
+	badCharactersError   = errors.New("bad characters in password")
+	tooShortError        = errors.New("too short password")
 )
 
 func (g *Gateway) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
-	header := Header{
-		Name: ctx.Value("username").(string),
+	username, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		fmt.Fprintf(w, "access forbidden")
+		return
 	}
-	hdr, _ := template.ParseFiles("templates/hdr.htm")
-	hdr.Execute(w, header)
+
+	executeHeaderTemplate(le, w, username)
 
 	mid, _ := template.ParseFiles("templates/chpass.htm")
 	mid.Execute(w, nil)
 
-	ftr, _ := template.ParseFiles("templates/ftr.htm")
-	ftr.Execute(w, nil)
+	executeFooterTemplate(le, w)
 
 	le.WithField("origin", "ChangePassword").Infof("request processed")
 }
@@ -45,14 +46,21 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
+	authenticatedUsername, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		fmt.Fprintf(w, "access forbidden")
+		return
+	}
+
 	r.ParseForm()
 	f1 := r.Form["pass1"]
 	f2 := r.Form["pass2"]
 	pass := f1[0]
 	passConfirm := f2[0]
 
-	err := changePasswordDo(le, g.db, pass, passConfirm, g.Options, ctx)
-	if err == passwordsMismatchError {
+	err := changePasswordDo(le, g.db, authenticatedUsername, pass, passConfirm, g.Options)
+	if err == errPasswordsMismatch {
 		fmt.Fprintf(w, "<p>Ошибка! Введенные пароли не совпадают.</p>")
 		return
 	} else if err == badCharactersError {
@@ -66,10 +74,10 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<p>Пароль изменен.</p>")
 }
 
-func changePasswordDo(le *logrus.Entry, db *sql.DB, pass, passConfirm string, o *options.Options, ctx context.Context) error {
+func changePasswordDo(le *logrus.Entry, db *sql.DB, authenticatedUsername, pass, passConfirm string, o *options.Options) error {
 	// checking if passwords don't match
 	if pass != passConfirm {
-		return passwordsMismatchError
+		return errPasswordsMismatch
 	}
 
 	// checking if password has not [[:graph:]] symbols
@@ -79,18 +87,16 @@ func changePasswordDo(le *logrus.Entry, db *sql.DB, pass, passConfirm string, o 
 	}
 
 	// checking password length
-	CleanMap := make(map[string]interface{}, 0)
+	CleanMap := make(map[string]interface{})
 	CleanMap["pass"] = pass
 	if len(pass) < o.MinPassLen {
 		return tooShortError
 	}
 
 	// changing password
-	username := ctx.Value("username").(string)
-
 	hash := makeHash(le, pass)
 
-	err := repository.UpdatePassword(db, username, hash)
+	err := repository.UpdatePassword(db, authenticatedUsername, hash)
 	if err != nil {
 		le.WithError(err).Error("password update failed")
 		return err
@@ -114,7 +120,7 @@ func changePasswordDo(le *logrus.Entry, db *sql.DB, pass, passConfirm string, o 
 	*/
 
 	// activating user
-	err = repository.SetUserStatus(le, username, true)
+	err = repository.SetUserStatus(le, authenticatedUsername, true)
 	if err != nil {
 		le.WithError(err).Error("user activation failed")
 		return err
@@ -126,23 +132,8 @@ func changePasswordDo(le *logrus.Entry, db *sql.DB, pass, passConfirm string, o 
 }
 
 /* makeHash generates MD5 hashes for given passwords */
-func makeHash(le *logrus.Entry, pass string) string {
-	cmd := exec.Command("openssl", "passwd", "-1", pass)
-	stdout, err := cmd.StdoutPipe()
-	if err != nil {
-		le.Errorf("%v", err)
-		return ""
-	}
+func makeHash(le *logrus.Entry, cleartext string) string {
+	hash := sha256.Sum256([]byte(cleartext))
 
-	cmd.Start()
-	pipe := bufio.NewReader(stdout)
-
-	line, _, err := pipe.ReadLine()
-	if err != nil {
-		le.Errorf("%v", err)
-		return ""
-	}
-
-	hash := string(line)
-	return hash
+	return hex.EncodeToString(hash[:])
 }

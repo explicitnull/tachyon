@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/sirupsen/logrus"
-	log "github.com/sirupsen/logrus"
 )
 
 const timeShort = "2006-01-02 15:04"
@@ -26,14 +25,14 @@ type Header struct {
 
 func getLogger(r *http.Request) *logrus.Entry {
 	ctx := r.Context()
-	le := log.WithField("requestID", ctx.Value("requestID")).WithField("username", ctx.Value("username"))
+	le := logrus.WithField("requestID", ctx.Value("requestID")).WithField("username", ctx.Value("username"))
 
 	return le
 }
 
 func getLoggerWithoutUsername(r *http.Request) *logrus.Entry {
 	ctx := r.Context()
-	le := log.WithField("requestID", ctx.Value("requestID"))
+	le := logrus.WithField("requestID", ctx.Value("requestID"))
 
 	return le
 }
@@ -48,6 +47,11 @@ func executeHeaderTemplate(le *logrus.Entry, w http.ResponseWriter, username str
 
 	header := Header{
 		Name: username,
+	}
+
+	// TODO: what is this?
+	if username == "furai" {
+		header.Item10 = "disabled"
 	}
 
 	hdr.Execute(w, header)
@@ -76,6 +80,6 @@ func executeFooterTemplate(le *logrus.Entry, w http.ResponseWriter) {
 
 func checkErr(err error) {
 	if err != nil {
-		log.Fatal(err)
+		logrus.Fatal(err)
 	}
 }

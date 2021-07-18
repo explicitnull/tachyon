@@ -16,12 +16,13 @@ import (
 const appName = "tachyon-web"
 
 func init() {
-	log.SetFormatter(&log.JSONFormatter{})
+	// log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(os.Stdout)
-	log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 }
 
 func main() {
+	// TODO: add govvv
 	log.Warnf("Starting %s...", appName)
 
 	appOptions := new(options.Options)
@@ -68,7 +69,7 @@ func main() {
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	http.Handle("/", r)
 
-	err = http.ListenAndServe(":8080", nil)
+	err = http.ListenAndServe(":8000", nil)
 	if err != nil {
 		log.Fatalf("starting HTTP server failed: %v", err)
 	}

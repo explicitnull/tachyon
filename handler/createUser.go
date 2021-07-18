@@ -20,7 +20,12 @@ func (g *Gateway) CreateUser(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
-	username := ctx.Value("username").(string)
+	username, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		fmt.Fprintf(w, "access forbidden")
+		return
+	}
 
 	if repository.GetRole(le, g.db, username) != "admin" {
 		le.Warn("access forbidden")
@@ -54,7 +59,12 @@ func (g *Gateway) CreateUserDo(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
-	authenticatedUsername := ctx.Value("username").(string)
+	authenticatedUsername, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		fmt.Fprintf(w, "access forbidden")
+		return
+	}
 
 	if repository.GetRole(le, g.db, authenticatedUsername) != "admin" {
 		le.Warn("access forbidden")
@@ -99,7 +109,6 @@ func (g *Gateway) CreateUserDo(w http.ResponseWriter, r *http.Request) {
 	mid.Execute(w, nil)
 
 	executeFooterTemplate(le, w)
-
 }
 
 func genPass() string {
