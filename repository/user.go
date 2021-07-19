@@ -1,18 +1,15 @@
 package repository
 
 import (
-	"database/sql"
 	"fmt"
 	"strconv"
 	"time"
 
-	as "github.com/aerospike/aerospike-client-go"
+	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"
 )
 
 var (
-	host      = "13.48.3.15"
-	port      = 3000
 	namespace = "tacacs"
 	set       = "users"
 )
@@ -42,32 +39,27 @@ type UserSummary struct {
 }
 
 // GetPasswordHash searches for password hash of given user
-func GetPasswordHash(db *sql.DB, username string) (string, error) {
-	client, err := as.NewClient(host, port)
-	if err != nil {
-		return "", nil
-	}
-
-	var key *as.Key
+func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string) (string, error) {
+	var key *aerospike.Key
 
 	skey := username
 	ikey, err := strconv.ParseInt(skey, 10, 64)
 	if err == nil {
-		key, err = as.NewKey(namespace, set, ikey)
+		key, err = aerospike.NewKey(namespace, set, ikey)
 		panicOnError(err)
 	} else {
-		key, err = as.NewKey(namespace, set, skey)
+		key, err = aerospike.NewKey(namespace, set, skey)
 		panicOnError(err)
 	}
 
-	policy := as.NewPolicy()
+	policy := aerospike.NewPolicy()
 	policy.SleepBetweenRetries = 50 * time.Millisecond
 	policy.MaxRetries = 10
 	policy.SleepMultiplier = 2.0
 
 	rec, err := client.Get(policy, key, "pass")
 	if err != nil {
-		logrus.Errorf("aerospike query failed: %v", err)
+		le.Errorf("aerospike query failed: %v", err)
 		return "", err
 	}
 
@@ -96,7 +88,7 @@ func printError(format string, a ...interface{}) {
 	fmt.Printf("error: "+format+"\n", a...)
 }
 
-func extractString(bins as.BinMap, bin string) (string, error) {
+func extractString(bins aerospike.BinMap, bin string) (string, error) {
 	passI, ok := bins[bin]
 	if ok {
 		pass, ok := passI.(string)
@@ -112,38 +104,33 @@ func extractString(bins as.BinMap, bin string) (string, error) {
 	return "", nil
 }
 
-func CreateUser(le *logrus.Entry, username, hash, mail, createdBy string, permisID, subdivID int) error {
-	client, err := as.NewClient(host, port)
-	if err != nil {
-		return err
-	}
-
-	var key *as.Key
+func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail, createdBy string, permisID, subdivID int) error {
+	var key *aerospike.Key
 
 	skey := username
 	ikey, err := strconv.ParseInt(skey, 10, 64)
 	if err == nil {
-		key, err = as.NewKey(namespace, set, ikey)
+		key, err = aerospike.NewKey(namespace, set, ikey)
 		if err != nil {
 			return err
 		}
 	} else {
-		key, err = as.NewKey(namespace, set, skey)
+		key, err = aerospike.NewKey(namespace, set, skey)
 		if err != nil {
 			return err
 		}
 	}
 
 	// NOTE: bin name must be less than 16 characters
-	bin1 := as.NewBin("username", username)
-	bin2 := as.NewBin("hash", hash)
-	bin3 := as.NewBin("mail", mail)
-	bin4 := as.NewBin("createdBy", createdBy)
-	bin5 := as.NewBin("permisID", permisID)
-	bin6 := as.NewBin("subdivID", subdivID)
-	bin7 := as.NewBin("createdTS", time.Now().Unix())
+	bin1 := aerospike.NewBin("username", username)
+	bin2 := aerospike.NewBin("hash", hash)
+	bin3 := aerospike.NewBin("mail", mail)
+	bin4 := aerospike.NewBin("createdBy", createdBy)
+	bin5 := aerospike.NewBin("permisID", permisID)
+	bin6 := aerospike.NewBin("subdivID", subdivID)
+	bin7 := aerospike.NewBin("createdTS", time.Now().Unix())
 
-	policy := as.NewWritePolicy(0, 0)
+	policy := aerospike.NewWritePolicy(0, 0)
 
 	err = client.PutBins(policy, key, bin1, bin2, bin3, bin4, bin5, bin6, bin7)
 	if err != nil {
@@ -155,7 +142,7 @@ func CreateUser(le *logrus.Entry, username, hash, mail, createdBy string, permis
 	return nil
 }
 
-func UpdatePassword(db *sql.DB, username, hash string) error {
+func UpdatePassword(aClient *aerospike.Client, username, hash string) error {
 	return nil
 }
 
@@ -163,11 +150,11 @@ func SetUserStatus(le *logrus.Entry, username string, active bool) error {
 	return nil
 }
 
-func GetUserCount(db *sql.DB) *UserSummary {
+func GetUserCount(aClient *aerospike.Client) *UserSummary {
 	return &UserSummary{}
 }
 
-func GetUsers(db *sql.DB) []*User {
+func GetUsers(aClient *aerospike.Client) []*User {
 	res := make([]*User, 0)
 
 	return res

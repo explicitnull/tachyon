@@ -3,17 +3,23 @@ package main
 import (
 	"net/http"
 	"os"
-	"tachyon-web/database"
 	"tachyon-web/handler"
 	"tachyon-web/middleware"
 	"tachyon-web/options"
 
+	"github.com/aerospike/aerospike-client-go"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
 	log "github.com/sirupsen/logrus"
 )
 
 const appName = "tachyon-web"
+
+var (
+	host      = "13.48.3.15"
+	port      = 3000
+	namespace = "tacacs"
+)
 
 func init() {
 	// log.SetFormatter(&log.JSONFormatter{})
@@ -32,20 +38,25 @@ func main() {
 		log.Fatalf("loading options failed: %v", err)
 	}
 
-	db := database.Open(appOptions.DbHost, appOptions.DbName, appOptions.DbName, appOptions.DbPassword)
+	// db := database.Open(appOptions.DbHost, appOptions.DbName, appOptions.DbName, appOptions.DbPassword)
+
+	aerospikeClient, err := aerospike.NewClient(host, port)
+	if err != nil {
+		log.Fatalf("aerospike init failed: %v", err)
+	}
 
 	var hashKey = []byte("secret")
 	var blockKey = []byte("1234567890123456")
-	sc := cookieInit(hashKey, blockKey)
+	sCookie := cookieInit(hashKey, blockKey)
 
 	// handlers
-	g, err := handler.NewGateway(appOptions, db, sc)
+	g, err := handler.NewGateway(appOptions, aerospikeClient, sCookie)
 	if err != nil {
 		log.Fatalf("handler init failed: %v", err)
 	}
 
 	// middleware
-	m, err := middleware.NewMiddleware(appOptions, sc)
+	m, err := middleware.NewMiddleware(appOptions, sCookie)
 	if err != nil {
 		log.Fatalf("middleware init failed: %v", err)
 	}

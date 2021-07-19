@@ -19,13 +19,13 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.db, username) == "none" {
+	if repository.GetRole(le, g.aerospikeClient, username) == "none" {
 		le.Warn("access forbidden")
 		fmt.Fprintf(w, "access forbidden")
 		return
 	}
 
-	sum := repository.GetUserCount(g.db)
+	sum := repository.GetUserCount(g.aerospikeClient)
 
 	executeHeaderTemplate(le, w, username)
 
@@ -35,7 +35,7 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	main.Execute(w, sum)
 
-	users := repository.GetUsers(g.db)
+	users := repository.GetUsers(g.aerospikeClient)
 
 	var flags [2]string
 

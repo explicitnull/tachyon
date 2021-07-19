@@ -2,7 +2,6 @@ package handler
 
 import (
 	"crypto/sha256"
-	"database/sql"
 	"encoding/hex"
 	"errors"
 	"fmt"
@@ -12,6 +11,7 @@ import (
 	"tachyon-web/options"
 	"tachyon-web/repository"
 
+	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"
 )
 
@@ -59,7 +59,7 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	pass := f1[0]
 	passConfirm := f2[0]
 
-	err := changePasswordDo(le, g.db, authenticatedUsername, pass, passConfirm, g.Options)
+	err := changePasswordDo(le, g.aerospikeClient, authenticatedUsername, pass, passConfirm, g.Options)
 	if err == errPasswordsMismatch {
 		fmt.Fprintf(w, "<p>Ошибка! Введенные пароли не совпадают.</p>")
 		return
@@ -74,7 +74,7 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<p>Пароль изменен.</p>")
 }
 
-func changePasswordDo(le *logrus.Entry, db *sql.DB, authenticatedUsername, pass, passConfirm string, o *options.Options) error {
+func changePasswordDo(le *logrus.Entry, aClient *aerospike.Client, authenticatedUsername, pass, passConfirm string, o *options.Options) error {
 	// checking if passwords don't match
 	if pass != passConfirm {
 		return errPasswordsMismatch
@@ -96,7 +96,7 @@ func changePasswordDo(le *logrus.Entry, db *sql.DB, authenticatedUsername, pass,
 	// changing password
 	hash := makeHash(le, pass)
 
-	err := repository.UpdatePassword(db, authenticatedUsername, hash)
+	err := repository.UpdatePassword(aClient, authenticatedUsername, hash)
 	if err != nil {
 		le.WithError(err).Error("password update failed")
 		return err

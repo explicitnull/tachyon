@@ -2,13 +2,14 @@ package handler
 
 import (
 	"bufio"
-	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
 	"os/exec"
 	"tachyon-web/repository"
 	"time"
+
+	"github.com/aerospike/aerospike-client-go"
 
 	"github.com/gorilla/securecookie"
 	"github.com/sirupsen/logrus"
@@ -32,7 +33,7 @@ func (g *Gateway) LoginDo(w http.ResponseWriter, r *http.Request) {
 
 	le = le.WithField("username", username)
 
-	ok := loginDo(le, username, password, g.db, r)
+	ok := loginDo(le, username, password, g.aerospikeClient, r)
 	if !ok {
 		t, err := template.ParseFiles("templates/loginerror.htm")
 		if err != nil {
@@ -60,8 +61,8 @@ func (g *Gateway) LoginDo(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func loginDo(le *logrus.Entry, username, formPassword string, db *sql.DB, r *http.Request) bool {
-	dbhash, err := repository.GetPasswordHash(db, username)
+func loginDo(le *logrus.Entry, username, formPassword string, aClient *aerospike.Client, r *http.Request) bool {
+	dbhash, err := repository.GetPasswordHash(le, aClient, username)
 	if err != nil {
 		le.WithError(err).Errorf("GetPasswordHash() failed")
 		return false

@@ -27,7 +27,7 @@ func (g *Gateway) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.db, username) != "admin" {
+	if repository.GetRole(le, g.aerospikeClient, username) != "admin" {
 		le.Warn("access forbidden")
 		fmt.Fprintf(w, "access forbidden")
 		return
@@ -66,7 +66,7 @@ func (g *Gateway) CreateUserDo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.db, authenticatedUsername) != "admin" {
+	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "admin" {
 		le.Warn("access forbidden")
 		fmt.Fprintf(w, "access forbidden")
 		return
@@ -85,8 +85,8 @@ func (g *Gateway) CreateUserDo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// normalization
-	subdiv_id := repository.GetSubdivisionID(le, g.db, subdiv)
-	prm_id, err := repository.GetPermId(le, g.db, prm)
+	subdiv_id := repository.GetSubdivisionID(le, g.aerospikeClient, subdiv)
+	prm_id, err := repository.GetPermId(le, g.aerospikeClient, prm)
 	if err != nil {
 		le.WithError(err).Error("getting permissions failed")
 		return
@@ -94,7 +94,7 @@ func (g *Gateway) CreateUserDo(w http.ResponseWriter, r *http.Request) {
 
 	hash := makeHash(le, genPass())
 
-	err = repository.CreateUser(le, username, hash, mail, authenticatedUsername, prm_id, subdiv_id)
+	err = repository.CreateUser(le, g.aerospikeClient, username, hash, mail, authenticatedUsername, prm_id, subdiv_id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Printf("Template error for user %s: %s", authenticatedUsername, err)

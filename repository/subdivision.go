@@ -1,12 +1,11 @@
 package repository
 
 import (
-	"database/sql"
-
+	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"
 )
 
 // 	GetSubdivisionID returns subdivision ID for DB normalization
-func GetSubdivisionID(le *logrus.Entry, db *sql.DB, div string) int {
+func GetSubdivisionID(le *logrus.Entry, aClient *aerospike.Client, div string) int {
 	return 0
 }
