@@ -94,7 +94,7 @@ func (g *Gateway) CreateUserDo(w http.ResponseWriter, r *http.Request) {
 
 	hash := makeHash(le, genPass())
 
-	repository.CreateUser(le, username, hash, mail, authenticatedUsername, prm_id, subdiv_id)
+	err = repository.CreateUser(le, username, hash, mail, authenticatedUsername, prm_id, subdiv_id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Printf("Template error for user %s: %s", authenticatedUsername, err)
@@ -109,6 +109,8 @@ func (g *Gateway) CreateUserDo(w http.ResponseWriter, r *http.Request) {
 	mid.Execute(w, nil)
 
 	executeFooterTemplate(le, w)
+
+	le.WithField("username", username).Info("user created")
 }
 
 func genPass() string {

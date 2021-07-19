@@ -3,6 +3,8 @@ package repository
 import (
 	"database/sql"
 	"fmt"
+	"strconv"
+	"time"
 
 	as "github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"
@@ -41,41 +43,43 @@ type UserSummary struct {
 
 // GetPasswordHash searches for password hash of given user
 func GetPasswordHash(db *sql.DB, username string) (string, error) {
-	// 	client, err := as.NewClient(host, port)
-	// 	if err != nil {
-	// 		return "", nil
-	// 	}
+	client, err := as.NewClient(host, port)
+	if err != nil {
+		return "", nil
+	}
 
-	// 	var key *as.Key
+	var key *as.Key
 
-	// 	skey := username
-	// 	ikey, err := strconv.ParseInt(skey, 10, 64)
-	// 	if err == nil {
-	// 		key, err = as.NewKey(namespace, set, ikey)
-	// 		panicOnError(err)
-	// 	} else {
-	// 		key, err = as.NewKey(namespace, set, skey)
-	// 		panicOnError(err)
-	// 	}
+	skey := username
+	ikey, err := strconv.ParseInt(skey, 10, 64)
+	if err == nil {
+		key, err = as.NewKey(namespace, set, ikey)
+		panicOnError(err)
+	} else {
+		key, err = as.NewKey(namespace, set, skey)
+		panicOnError(err)
+	}
 
-	// 	policy := as.NewPolicy()
+	policy := as.NewPolicy()
+	policy.SleepBetweenRetries = 50 * time.Millisecond
+	policy.MaxRetries = 10
+	policy.SleepMultiplier = 2.0
 
-	// 	rec, err := client.Get(policy, key, "pass")
-	// 	if err != nil {
-	// 		logrus.Errorf("aerospike query failed: %v", err)
-	// 		return "", err
-	// 	}
+	rec, err := client.Get(policy, key, "pass")
+	if err != nil {
+		logrus.Errorf("aerospike query failed: %v", err)
+		return "", err
+	}
 
-	// 	if rec != nil {
-	// 		printOK("%v", rec.Bins)
-	// 		return extractString(rec.Bins, "pass")
+	if rec != nil {
+		printOK("%v", rec.Bins)
+		return extractString(rec.Bins, "pass")
 
-	// 	} else {
-	// 		printError("record not found: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
-	// 	}
+	} else {
+		printError("record not found: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+	}
 
-	// 	return "", nil
-	return "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08", nil
+	return "", nil
 }
 
 func panicOnError(err error) {
@@ -94,7 +98,7 @@ func printError(format string, a ...interface{}) {
 
 func extractString(bins as.BinMap, bin string) (string, error) {
 	passI, ok := bins[bin]
-	if !ok {
+	if ok {
 		pass, ok := passI.(string)
 		if ok {
 			return pass, nil
@@ -109,6 +113,45 @@ func extractString(bins as.BinMap, bin string) (string, error) {
 }
 
 func CreateUser(le *logrus.Entry, username, hash, mail, createdBy string, permisID, subdivID int) error {
+	client, err := as.NewClient(host, port)
+	if err != nil {
+		return err
+	}
+
+	var key *as.Key
+
+	skey := username
+	ikey, err := strconv.ParseInt(skey, 10, 64)
+	if err == nil {
+		key, err = as.NewKey(namespace, set, ikey)
+		if err != nil {
+			return err
+		}
+	} else {
+		key, err = as.NewKey(namespace, set, skey)
+		if err != nil {
+			return err
+		}
+	}
+
+	// NOTE: bin name must be less than 16 characters
+	bin1 := as.NewBin("username", username)
+	bin2 := as.NewBin("hash", hash)
+	bin3 := as.NewBin("mail", mail)
+	bin4 := as.NewBin("createdBy", createdBy)
+	bin5 := as.NewBin("permisID", permisID)
+	bin6 := as.NewBin("subdivID", subdivID)
+	bin7 := as.NewBin("createdTS", time.Now().Unix())
+
+	policy := as.NewWritePolicy(0, 0)
+
+	err = client.PutBins(policy, key, bin1, bin2, bin3, bin4, bin5, bin6, bin7)
+	if err != nil {
+		return err
+	}
+
+	le.Debugf("record inserted: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+
 	return nil
 }
 
