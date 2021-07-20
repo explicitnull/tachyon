@@ -13,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const appName = "tachyon-web"
+const appName = "tacacs-webconsole"
 
 var (
 	host      = "13.48.3.15"
@@ -29,7 +29,7 @@ func init() {
 
 func main() {
 	// TODO: add govvv
-	log.Warnf("Starting %s...", appName)
+	log.Warnf("starting %s...", appName)
 
 	appOptions := new(options.Options)
 
@@ -80,6 +80,7 @@ func main() {
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	http.Handle("/", r)
 
+	log.Warn("listening http on port 8000")
 	err = http.ListenAndServe(":8000", nil)
 	if err != nil {
 		log.Fatalf("starting HTTP server failed: %v", err)

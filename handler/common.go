@@ -1,8 +1,11 @@
 package handler
 
 import (
+	"crypto/sha256"
+	"encoding/base64"
 	"html/template"
 	"net/http"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -82,4 +85,24 @@ func checkErr(err error) {
 	if err != nil {
 		logrus.Fatal(err)
 	}
+}
+
+// makeHash generates SHA hashes for given passwords
+func makeHash(le *logrus.Entry, cleartext string) string {
+	hash := sha256.Sum256([]byte(cleartext))
+	enc := base64.StdEncoding.EncodeToString(hash[:])
+	return strings.Replace(enc, "=", "", -1)
+}
+
+// makeFormSelect selects one column from specified table and returns it as slice
+func makeFormSelect(table, col, usr string) []string {
+	if col == "subdiv" {
+		return []string{"europe", "asia"}
+	} else if col == "prm" {
+		return []string{"rw", "ro"}
+	}
+
+	out := []string{"def", "def"}
+
+	return out
 }

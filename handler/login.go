@@ -37,7 +37,8 @@ func (g *Gateway) LoginDo(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		t, err := template.ParseFiles("templates/loginerror.htm")
 		if err != nil {
-			le.Errorf("%v", err)
+			le.WithError(err).Error("template parsing failed")
+			http.Error(w, "template parsing failed", http.StatusInternalServerError)
 			return
 		}
 		t.Execute(w, nil)
@@ -48,13 +49,16 @@ func (g *Gateway) LoginDo(w http.ResponseWriter, r *http.Request) {
 	err := setCookie(w, username, g.sc)
 	if err != nil {
 		fmt.Fprintf(w, "setting cookie failed")
-		le.Errorf("%v", err)
+		le.WithError(err).Error("setting cookie failed")
+		http.Error(w, "setting cookie failed", http.StatusFailedDependency)
+
 		return
 	}
 
 	mid, err := template.ParseFiles("templates/loginok.htm")
 	if err != nil {
-		le.Errorf("%v", err)
+		le.WithError(err).Error("template parsing failed")
+		http.Error(w, "template parsing failed", http.StatusInternalServerError)
 		return
 	}
 	mid.Execute(w, nil)
@@ -110,7 +114,7 @@ func setCookie(w http.ResponseWriter, username string, sc *securecookie.SecureCo
 	return nil
 }
 
-func hashPassword(le *logrus.Entry, salt, password string) string {
+func makeHashWithSalt(le *logrus.Entry, salt, password string) string {
 	cmd := exec.Command("openssl", "passwd", "-1", "-salt", salt, password)
 
 	stdout, err := cmd.StdoutPipe()

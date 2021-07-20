@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
 	"errors"
 	"fmt"
 	"html/template"
@@ -129,11 +127,4 @@ func changePasswordDo(le *logrus.Entry, aClient *aerospike.Client, authenticated
 	le.Info("user status switched to active due to password update")
 
 	return nil
-}
-
-/* makeHash generates MD5 hashes for given passwords */
-func makeHash(le *logrus.Entry, cleartext string) string {
-	hash := sha256.Sum256([]byte(cleartext))
-
-	return hex.EncodeToString(hash[:])
 }

@@ -6,6 +6,6 @@ import (
 )
 
 // 	GetSubdivisionID returns subdivision ID for DB normalization
-func GetSubdivisionID(le *logrus.Entry, aClient *aerospike.Client, div string) int {
-	return 0
+func GetSubdivisionID(le *logrus.Entry, aClient *aerospike.Client, div string) (int, error) {
+	return 1, nil
 }

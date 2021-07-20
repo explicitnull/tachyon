@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"context"
 	"html/template"
 	"net/http"
 
@@ -53,15 +52,9 @@ func checkCookie(r *http.Request, sc *securecookie.SecureCookie, le *log.Entry) 
 	val := make(map[string]string)
 	err = sc.Decode("username", cookie.Value, &val)
 	if err != nil {
-		le.Error("cookie decoding failed")
+		le.WithError(err).Error("cookie decoding failed")
 		return "", false
 	}
 
 	return val["name"], true
-}
-
-func setUsernameInContext(r *http.Request, username string) {
-	ctx := r.Context()
-	ctx = context.WithValue(ctx, "username", username)
-	r = r.WithContext(ctx)
 }

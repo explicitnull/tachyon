@@ -59,7 +59,7 @@ func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string
 
 	rec, err := client.Get(policy, key, "pass")
 	if err != nil {
-		le.Errorf("aerospike query failed: %v", err)
+		le.WithError(err).Error("aerospike query failed")
 		return "", err
 	}
 
@@ -123,12 +123,12 @@ func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail
 
 	// NOTE: bin name must be less than 16 characters
 	bin1 := aerospike.NewBin("username", username)
-	bin2 := aerospike.NewBin("hash", hash)
+	bin2 := aerospike.NewBin("pass", hash)
 	bin3 := aerospike.NewBin("mail", mail)
 	bin4 := aerospike.NewBin("createdBy", createdBy)
 	bin5 := aerospike.NewBin("permisID", permisID)
 	bin6 := aerospike.NewBin("subdivID", subdivID)
-	bin7 := aerospike.NewBin("createdTS", time.Now().Unix())
+	bin7 := aerospike.NewBin("createdTs", time.Now().Unix())
 
 	policy := aerospike.NewWritePolicy(0, 0)
 

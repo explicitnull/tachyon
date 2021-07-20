@@ -14,7 +14,9 @@ func (g *Gateway) Logout(w http.ResponseWriter, r *http.Request) {
 
 	t, err := template.ParseFiles("templates/logout.htm")
 	if err != nil {
-		le.Errorf("%v", err)
+		le.WithError(err).Error("template parsing failed")
+		http.Error(w, "template parsing failed", http.StatusInternalServerError)
+		return
 	}
 	t.Execute(w, nil)
 }

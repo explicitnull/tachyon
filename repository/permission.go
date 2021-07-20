@@ -6,5 +6,5 @@ import (
 )
 
 func GetPermId(le *logrus.Entry, aClient *aerospike.Client, prm string) (int, error) {
-	return 0, nil
+	return 2, nil
 }

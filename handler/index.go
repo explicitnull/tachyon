@@ -13,8 +13,8 @@ func (g *Gateway) Index(w http.ResponseWriter, r *http.Request) {
 	if g.Options.Maintenance == "yes" {
 		t, err := template.ParseFiles("templates/mntn.htm")
 		if err != nil {
-			fmt.Fprintf(w, "error parsing template")
-			le.Fatal(err)
+			le.WithError(err).Error("template parsing failed")
+			http.Error(w, "template parsing failed", http.StatusInternalServerError)
 		}
 		t.Execute(w, nil)
 		return
