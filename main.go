@@ -66,6 +66,7 @@ func main() {
 	r.HandleFunc("/login/", g.Login).Methods("GET")
 	r.HandleFunc("/login/", g.LoginDo).Methods("POST")
 	r.HandleFunc("/logout/", g.Logout)
+
 	r.HandleFunc("/passwd/", g.ChangePassword).Methods("GET")
 	r.HandleFunc("/passwd/", g.ChangePasswordDo).Methods("POST")
 	r.HandleFunc("/newuser/", g.CreateUser).Methods("GET")

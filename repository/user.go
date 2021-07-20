@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"log"
 	"strconv"
 	"time"
 
@@ -151,11 +152,96 @@ func SetUserStatus(le *logrus.Entry, username string, active bool) error {
 }
 
 func GetUserCount(aClient *aerospike.Client) *UserSummary {
-	return &UserSummary{}
+	return &UserSummary{
+		Total:  0,
+		Active: 0,
+	}
 }
 
-func GetUsers(aClient *aerospike.Client) []*User {
-	res := make([]*User, 0)
+type Metrics struct {
+	count int
+	total int
+}
 
-	return res
+var setMap = make(map[string]Metrics)
+
+func GetUsers(le *logrus.Entry, aclient *aerospike.Client) ([]*User, error) {
+	result := make([]*User, 0)
+
+	recs := make([]*aerospike.Record, 0)
+
+	policy := aerospike.NewScanPolicy()
+	policy.RecordsPerSecond = 1000
+
+	nodeList := aclient.GetNodes()
+	begin := time.Now()
+
+	for _, node := range nodeList {
+		le.Debug("scan node ", node.GetName())
+		recordset, err := aclient.ScanNode(policy, node, namespace, set)
+		if err != nil {
+			return result, err
+		}
+
+	L:
+		for {
+			select {
+			case rec := <-recordset.Records:
+				if rec == nil {
+					break L
+				}
+
+				metrics, exists := setMap[rec.Key.SetName()]
+
+				if !exists {
+					metrics = Metrics{}
+				}
+				metrics.count++
+				metrics.total++
+				setMap[rec.Key.SetName()] = metrics
+
+				recs = append(recs, rec)
+
+			case <-recordset.Errors:
+				// if there was an error, stop
+				panicOnError(err)
+			}
+		}
+
+		for k, v := range setMap {
+			log.Println("Node ", node, " set ", k, " count: ", v.count)
+			v.count = 0
+		}
+	}
+
+	for _, v := range recs {
+		// username, err := extractString(v.Bins, "username")
+		// if err != nil {
+		// 	return result, err
+		// }
+
+		mail, err := extractString(v.Bins, "mail")
+		if err != nil {
+			return result, err
+		}
+
+		createdBy, err := extractString(v.Bins, "createdBy")
+		if err != nil {
+			return result, err
+		}
+
+		user := &User{
+			// Name:   username,
+			Mail:   mail,
+			CreaBy: createdBy,
+		}
+
+		result = append(result, user)
+	}
+
+	end := time.Now()
+	seconds := float64(end.Sub(begin)) / float64(time.Second)
+	log.Println("Elapsed time: ", seconds, " seconds")
+
+	return result, nil
 }
