@@ -6,25 +6,20 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
+	"tachyon-web/types"
 
 	"github.com/sirupsen/logrus"
 )
 
 const timeShort = "2006-01-02 15:04"
 
-type Header struct {
-	Name   string
-	Item1  string
-	Item2  string
-	Item3  string
-	Item4  string
-	Item5  string
-	Item6  string
-	Item7  string
-	Item8  string
-	Item9  string
-	Item10 string
-}
+// error strings for responses and logs
+const (
+	noIDinURL     = "no id in URL"
+	databaseError = "database error"
+)
+
+const emptySelect = "--"
 
 func getLogger(r *http.Request) *logrus.Entry {
 	ctx := r.Context()
@@ -48,7 +43,7 @@ func executeHeaderTemplate(le *logrus.Entry, w http.ResponseWriter, username str
 		return
 	}
 
-	header := Header{
+	header := types.TemplateHeader{
 		Name: username,
 	}
 
@@ -59,7 +54,7 @@ func executeHeaderTemplate(le *logrus.Entry, w http.ResponseWriter, username str
 
 	hdr.Execute(w, header)
 	if err != nil {
-		le.WithError(err).Error("template parsing failed")
+		le.WithError(err).Error("template execution failed")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
@@ -75,15 +70,25 @@ func executeFooterTemplate(le *logrus.Entry, w http.ResponseWriter) {
 
 	ftr.Execute(w, nil)
 	if err != nil {
-		le.WithError(err).Error("template parsing failed")
+		le.WithError(err).Error("template execution failed")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 }
 
-func checkErr(err error) {
+func executeTemplate(le *logrus.Entry, w http.ResponseWriter, filename string, data interface{}) {
+	tmpl, err := template.ParseFiles("templates/" + filename)
 	if err != nil {
-		logrus.Fatal(err)
+		le.WithError(err).Error("template parsing failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	tmpl.Execute(w, data)
+	if err != nil {
+		le.WithError(err).Error("template execution failed")
+		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -92,17 +97,4 @@ func makeHash(le *logrus.Entry, cleartext string) string {
 	hash := sha256.Sum256([]byte(cleartext))
 	enc := base64.StdEncoding.EncodeToString(hash[:])
 	return strings.Replace(enc, "=", "", -1)
-}
-
-// makeFormSelect selects one column from specified table and returns it as slice
-func makeFormSelect(table, col, usr string) []string {
-	if col == "subdiv" {
-		return []string{"europe", "asia"}
-	} else if col == "prm" {
-		return []string{"rw", "ro"}
-	}
-
-	out := []string{"def", "def"}
-
-	return out
 }

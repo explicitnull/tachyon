@@ -25,7 +25,7 @@ func (g *Gateway) Login(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, nil)
 }
 
-func (g *Gateway) LoginDo(w http.ResponseWriter, r *http.Request) {
+func (g *Gateway) LoginAction(w http.ResponseWriter, r *http.Request) {
 	le := getLoggerWithoutUsername(r)
 
 	username := r.PostFormValue("username")
@@ -33,7 +33,7 @@ func (g *Gateway) LoginDo(w http.ResponseWriter, r *http.Request) {
 
 	le = le.WithField("username", username)
 
-	ok := loginDo(le, username, password, g.aerospikeClient, r)
+	ok := loginAction(le, username, password, g.aerospikeClient, r)
 	if !ok {
 		t, err := template.ParseFiles("templates/loginerror.htm")
 		if err != nil {
@@ -65,7 +65,7 @@ func (g *Gateway) LoginDo(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func loginDo(le *logrus.Entry, username, formPassword string, aClient *aerospike.Client, r *http.Request) bool {
+func loginAction(le *logrus.Entry, username, formPassword string, aClient *aerospike.Client, r *http.Request) bool {
 	dbhash, err := repository.GetPasswordHash(le, aClient, username)
 	if err != nil {
 		le.WithError(err).Errorf("GetPasswordHash() failed")

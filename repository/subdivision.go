@@ -9,3 +9,7 @@ import (
 func GetSubdivisionID(le *logrus.Entry, aClient *aerospike.Client, div string) (int, error) {
 	return 1, nil
 }
+
+func GetSubdivisionsList(le *logrus.Entry, aclient *aerospike.Client) []string {
+	return []string{"europe", "asia"}
+}

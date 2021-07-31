@@ -23,7 +23,6 @@ func (g *Gateway) Index(w http.ResponseWriter, r *http.Request) {
 	username, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		fmt.Fprintf(w, "access forbidden")
 		return
 	}
 

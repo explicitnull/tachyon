@@ -15,8 +15,8 @@ import (
 
 var (
 	errPasswordsMismatch = errors.New("passwords mismatch")
-	badCharactersError   = errors.New("bad characters in password")
-	tooShortError        = errors.New("too short password")
+	errBadCharacters     = errors.New("bad characters in password")
+	errTooShort          = errors.New("too short password")
 )
 
 func (g *Gateway) ChangePassword(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +26,6 @@ func (g *Gateway) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	username, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		fmt.Fprintf(w, "access forbidden")
 		return
 	}
 
@@ -40,14 +39,13 @@ func (g *Gateway) ChangePassword(w http.ResponseWriter, r *http.Request) {
 	le.WithField("origin", "ChangePassword").Infof("request processed")
 }
 
-func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
+func (g *Gateway) ChangePasswordAction(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
 	authenticatedUsername, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		fmt.Fprintf(w, "access forbidden")
 		return
 	}
 
@@ -57,14 +55,14 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	pass := f1[0]
 	passConfirm := f2[0]
 
-	err := changePasswordDo(le, g.aerospikeClient, authenticatedUsername, pass, passConfirm, g.Options)
+	err := changePasswordAction(le, g.aerospikeClient, authenticatedUsername, pass, passConfirm, g.Options)
 	if err == errPasswordsMismatch {
 		fmt.Fprintf(w, "<p>Ошибка! Введенные пароли не совпадают.</p>")
 		return
-	} else if err == badCharactersError {
+	} else if err == errBadCharacters {
 		fmt.Fprintln(w, "<p>Ошибка! Пароль содержит недопустимые символы. Забыли переключить раскладку?</p>")
 		return
-	} else if err == tooShortError {
+	} else if err == errTooShort {
 		fmt.Fprintln(w, "Ошибка! Пароль содержит слишком мало символов")
 		return
 	}
@@ -72,7 +70,7 @@ func (g *Gateway) ChangePasswordDo(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<p>Пароль изменен.</p>")
 }
 
-func changePasswordDo(le *logrus.Entry, aClient *aerospike.Client, authenticatedUsername, pass, passConfirm string, o *options.Options) error {
+func changePasswordAction(le *logrus.Entry, aClient *aerospike.Client, authenticatedUsername, pass, passConfirm string, o *options.Options) error {
 	// checking if passwords don't match
 	if pass != passConfirm {
 		return errPasswordsMismatch
@@ -81,20 +79,20 @@ func changePasswordDo(le *logrus.Entry, aClient *aerospike.Client, authenticated
 	// checking if password has not [[:graph:]] symbols
 	ok, _ := regexp.MatchString("^[[:graph:]]+$", pass)
 	if !ok {
-		return badCharactersError
+		return errBadCharacters
 	}
 
 	// checking password length
 	CleanMap := make(map[string]interface{})
 	CleanMap["pass"] = pass
 	if len(pass) < o.MinPassLen {
-		return tooShortError
+		return errTooShort
 	}
 
 	// changing password
 	hash := makeHash(le, pass)
 
-	err := repository.UpdatePassword(aClient, authenticatedUsername, hash)
+	err := repository.SetPassword(aClient, authenticatedUsername, hash)
 	if err != nil {
 		le.WithError(err).Error("password update failed")
 		return err
@@ -118,7 +116,7 @@ func changePasswordDo(le *logrus.Entry, aClient *aerospike.Client, authenticated
 	*/
 
 	// activating user
-	err = repository.SetUserStatus(le, authenticatedUsername, true)
+	err = repository.SetAccountStatus(le, authenticatedUsername, "active")
 	if err != nil {
 		le.WithError(err).Error("user activation failed")
 		return err

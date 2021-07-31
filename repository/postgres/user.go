@@ -140,7 +140,7 @@ func GetPasswordHash(db *sql.DB, username string) (string, error) {
 	return hash, err
 }
 
-func UpdatePassword(db *sql.DB, usr, hash string) error {
+func SetPassword(db *sql.DB, usr, hash string) error {
 	stmt, err := db.Prepare(updatePasswordQuery)
 	if err != nil {
 		log.Errorf("%v", err)

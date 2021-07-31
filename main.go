@@ -64,15 +64,34 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", g.Index)
 	r.HandleFunc("/login/", g.Login).Methods("GET")
-	r.HandleFunc("/login/", g.LoginDo).Methods("POST")
+	r.HandleFunc("/login/", g.LoginAction).Methods("POST")
 	r.HandleFunc("/logout/", g.Logout)
 
 	r.HandleFunc("/passwd/", g.ChangePassword).Methods("GET")
-	r.HandleFunc("/passwd/", g.ChangePasswordDo).Methods("POST")
-	r.HandleFunc("/newuser/", g.CreateUser).Methods("GET")
-	r.HandleFunc("/newuser/", g.CreateUserDo).Methods("POST")
+	r.HandleFunc("/passwd/", g.ChangePasswordAction).Methods("POST")
 
 	r.HandleFunc("/users/", g.ShowUsers)
+	r.HandleFunc("/newuser/", g.CreateUser).Methods("GET")
+	r.HandleFunc("/newuser/", g.CreateUserAction).Methods("POST")
+	r.HandleFunc("/edituser/{name}/", g.EditAccount).Methods("GET")
+	r.HandleFunc("/edituser/{id:[0-9]+}/", g.EditAccountAction).Methods("POST")
+
+	// mx.HandleFunc("/permissions/", showPrm)
+	r.HandleFunc("/newpermission/", g.CreatePermission).Methods("GET")
+	r.HandleFunc("/newpermission/", g.CreatePermissionAction).Methods("POST")
+	// r.HandleFunc("/editpermission/{id}/", editPermission).Methods("GET")
+	// r.HandleFunc("/editpermission/{id}/", editPermissionAction).Methods("POST")
+
+	// r.HandleFunc("/removeuser/{id:[0-9]+}/", remUser)
+	// r.HandleFunc("/acct/", showAcct)
+	// r.HandleFunc("/acct-search/", searchAcct)
+
+	// mx.HandleFunc("/equipment/", showEqp)
+	// mx.HandleFunc("/lockout/", showLock)
+	// mx.HandleFunc("/auth/", showAuth)
+	// mx.HandleFunc("/adm/", adm)
+	// mx.HandleFunc("/subdiv/", showSubdiv)
+	// mx.HandleFunc("/log/", showLog)
 
 	r.Use(m.Log)
 	r.Use(m.CheckCookie)
