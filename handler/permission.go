@@ -10,6 +10,35 @@ type PermissionCreated struct {
 	Name string
 }
 
+func (g *Gateway) ShowPermissions(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	le := getLogger(r)
+
+	authenticatedUsername, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		return
+	}
+
+	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "admin" {
+		le.Warn("access forbidden")
+		http.Error(w, "access forbidden", http.StatusForbidden)
+		return
+	}
+
+	items, _ := repository.GetPermissions(le, g.aerospikeClient)
+
+	perms := &types.Permissions{
+		Items: items,
+	}
+
+	executeHeaderTemplate(le, w, authenticatedUsername)
+
+	executeTemplate(le, w, "prm.htm", perms)
+
+	executeFooterTemplate(le, w)
+}
+
 func (g *Gateway) CreatePermission(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)

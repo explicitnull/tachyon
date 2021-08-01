@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 	"tachyon-web/repository"
 	"tachyon-web/types"
@@ -29,30 +28,19 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	sum := repository.GetUserCount(g.aerospikeClient)
-	aa, _ := repository.GetUsers(le, g.aerospikeClient)
+	items, _ := repository.GetUsers(le, g.aerospikeClient)
+
+	accounts := &types.Accounts{
+		Items:  items,
+		Total:  0,
+		Active: 0,
+	}
 
 	executeHeaderTemplate(le, w, username)
 
-	mid, err := template.ParseFiles("templates/users.htm")
-	if err != nil {
-		le.WithError(err).Error("template parsing failed")
-		return
-	}
-	mid.Execute(w, sum)
+	executeTemplate(le, w, "users.htm", accounts)
 
-	for _, a := range aa {
-		id := a.Name
-		fmt.Fprintf(w, `<tr><td><a href="/edituser/%v/">%s</a></td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>`,
-			id, a.Name, a.Permission, a.Subdivision, a.Mail, a.CreatedTimestamp, a.Status, a.PasswordSetTimestamp, a.CreatedBy)
-	}
-	fmt.Fprintln(w, "</table></div>")
-
-	ftr, err := template.ParseFiles("templates/ftr-to-top.htm")
-	if err != nil {
-		le.WithError(err).Error("template parsing failed")
-	}
-	ftr.Execute(w, nil)
+	executeFooterTemplate(le, w)
 }
 
 type FormOptions struct {
@@ -107,12 +95,6 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
 	}
-
-	// b, err := io.ReadAll(r.Body)
-	// if err != nil {
-	// 	le.Error(err)
-	// }
-	// fmt.Println(string(b))
 
 	r.ParseForm()
 	acc := types.Account{
@@ -210,24 +192,13 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// filling template data
-	td := types.AccountTemplateData{
-		Name:   acc.Name,
-		Mail:   acc.Mail,
-		Subdiv: acc.Subdivision,
-		Prm:    acc.Permission,
-	}
-
-	if acc.Status == "active" {
-		td.ActiveBox = "checked"
-	}
-
-	td.SubdivList = repository.GetSubdivisionsList(le, g.aerospikeClient)
-	td.PrmList = repository.GetPermissionsList(le, g.aerospikeClient)
+	acc.SubdivisionsList = repository.GetSubdivisionsList(le, g.aerospikeClient)
+	acc.PermissionsList = repository.GetPermissionsList(le, g.aerospikeClient)
 
 	// writing response
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	executeTemplate(le, w, "user.htm", td)
+	executeTemplate(le, w, "user.htm", acc)
 
 	executeFooterTemplate(le, w)
 }
@@ -250,14 +221,11 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 
 	// parsing request
 	vars := mux.Vars(r)
-	username, ok := vars["username"]
-	if !ok {
-		le.Error(noIDinURL)
-	}
 
 	r.ParseForm()
 	fac := &types.Account{
-		Password:    r.PostFormValue("pwd"),
+		Name:        vars["name"],
+		Cleartext:   r.PostFormValue("pwd"),
 		Subdivision: r.PostFormValue("subdiv"),
 		Permission:  r.PostFormValue("perm"),
 		Mail:        r.PostFormValue("m"),
@@ -269,46 +237,46 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// getting account data from DB
-	dbac, err := repository.GetAccountByName(le, g.aerospikeClient, username)
+	dbac, err := repository.GetAccountByName(le, g.aerospikeClient, fac.Name)
 	if err != nil {
 		le.WithError(err).Error("getting account failed")
 		http.Error(w, "access forbidden", http.StatusForbidden)
 	}
 
 	// applying changes
-	if fac.Password != "" {
-		hash := makeHash(le, fac.Password)
+	if fac.Cleartext != "" {
+		hash := makeHash(le, fac.Cleartext)
 		le.Debug(hash)
 
-		err = repository.SetPassword(g.aerospikeClient, username, hash)
+		err = repository.SetPassword(g.aerospikeClient, fac.Name, hash)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
 		}
 	}
 
 	if fac.Subdivision != emptySelect && fac.Subdivision != dbac.Subdivision {
-		err = repository.SetSubdivision(username, fac.Subdivision)
+		err = repository.SetSubdivision(fac.Name, fac.Subdivision)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
 		}
 	}
 
 	if fac.Permission != emptySelect && fac.Permission != dbac.Permission {
-		err = repository.SetSubdivision(username, fac.Subdivision)
+		err = repository.SetSubdivision(fac.Name, fac.Subdivision)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
 		}
 	}
 
 	if fac.Mail != "" && fac.Mail != dbac.Mail {
-		err = repository.SetMail(username, fac.Mail)
+		err = repository.SetMail(fac.Name, fac.Mail)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
 		}
 	}
 
 	if fac.Status != dbac.Status {
-		err = repository.SetAccountStatus(le, username, fac.Status)
+		err = repository.SetAccountStatus(le, fac.Name, fac.Status)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
 		}

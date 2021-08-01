@@ -13,32 +13,9 @@ import (
 )
 
 const (
-	namespace = "tacacs"
-	set       = "users"
+	namespace   = "tacacs"
+	accountsSet = "users"
 )
-
-type User struct {
-	Id                   int
-	Name                 string
-	Hash                 string // Password hash
-	Cleartext            string
-	Subdiv               string
-	Prm                  string
-	Mail                 string
-	Status               string
-	CreaTime             string // Full time form
-	CreaTimeS            string // Short time form
-	CreaBy               string
-	PassChd              string
-	SubdivList           []string
-	PrmList              []string
-	PasswordSetTimestamp string
-}
-
-type UserSummary struct {
-	Total  int
-	Active int
-}
 
 // GetPasswordHash searches for password hash of given user
 func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string) (string, error) {
@@ -47,10 +24,10 @@ func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string
 	skey := username
 	ikey, err := strconv.ParseInt(skey, 10, 64)
 	if err == nil {
-		key, err = aerospike.NewKey(namespace, set, ikey)
+		key, err = aerospike.NewKey(namespace, accountsSet, ikey)
 		panicOnError(err)
 	} else {
-		key, err = aerospike.NewKey(namespace, set, skey)
+		key, err = aerospike.NewKey(namespace, accountsSet, skey)
 		panicOnError(err)
 	}
 
@@ -70,7 +47,7 @@ func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string
 		return extractString(rec.Bins, "pass")
 
 	} else {
-		printError("record not found: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+		printError("record not found: namespace=%s accountsSet=%s key=%v", key.Namespace(), key.SetName(), key.Value())
 	}
 
 	return "", nil
@@ -95,7 +72,7 @@ func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail
 
 	skey := username
 
-	key, err := aerospike.NewKey(namespace, set, skey)
+	key, err := aerospike.NewKey(namespace, accountsSet, skey)
 	if err != nil {
 		return err
 	}
@@ -118,16 +95,9 @@ func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail
 		return err
 	}
 
-	le.Debugf("record inserted: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+	le.Debugf("record inserted: namespace=%s accountsSet=%s key=%v", key.Namespace(), key.SetName(), key.Value())
 
 	return nil
-}
-
-func GetUserCount(aClient *aerospike.Client) *UserSummary {
-	return &UserSummary{
-		Total:  0,
-		Active: 0,
-	}
 }
 
 type Metrics struct {
@@ -150,7 +120,7 @@ func GetUsers(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Account, er
 
 	for _, node := range nodeList {
 		le.Debug("scan node ", node.GetName())
-		recordset, err := aclient.ScanNode(policy, node, namespace, set)
+		recordset, err := aclient.ScanNode(policy, node, namespace, accountsSet)
 		if err != nil {
 			return nil, err
 		}
@@ -181,7 +151,7 @@ func GetUsers(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Account, er
 		}
 
 		for k, v := range setMap {
-			log.Println("Node ", node, " set ", k, " count: ", v.count)
+			log.Println("Node ", node, " accountsSet ", k, " count: ", v.count)
 			v.count = 0
 		}
 	}
@@ -207,7 +177,7 @@ func GetAccountByName(le *logrus.Entry, client *aerospike.Client, name string) (
 	var key *aerospike.Key
 
 	skey := name
-	key, err := aerospike.NewKey(namespace, set, skey)
+	key, err := aerospike.NewKey(namespace, accountsSet, skey)
 	panicOnError(err)
 
 	policy := aerospike.NewPolicy()
@@ -222,7 +192,7 @@ func GetAccountByName(le *logrus.Entry, client *aerospike.Client, name string) (
 	}
 
 	if rec == nil {
-		printError("record not found: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+		printError("record not found: namespace=%s accountsSet=%s key=%v", key.Namespace(), key.SetName(), key.Value())
 		return nil, errors.New("record not found")
 	}
 

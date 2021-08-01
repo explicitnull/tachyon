@@ -1,20 +1,38 @@
-<!--         <h2>Учетные записи</h2></div>
-         <p><a href="/accounts/new">Создать новую</a></p><br/>
-         <table border='1'>
-         <tr><td><b>Логин</b></td><td><b>Права доступа</b></td><td><b>Группа в Cisco ACS</b></td><td><b>Создана</b></td><td><b>Статус</b></td><td><b>Пароль изменен</b></td></tr>
--->
 <script src="js/demo.js"></script>
-          <h3 class="test-header">Учетные записи</h3>
-	  <div class="test-body">
-	  <p>Всего записей: {{.Total}}, из них активно: {{.Active}}.</p>
-	      <p><a href="/newuser/" class="button is-info" role="button">Создать пользователя</a></p><br/>
-   	      <table class="table small is-striped">
-	           <thead><th>Логин
-	<!--				<a href="javascript:;">
+<h3 class="test-header">Учетные записи</h3>
+<div class="test-body">
+    <p>Всего записей: {{.Total}}, из них активно: {{.Active}}.</p>
+    <p><a href="/newuser/" class="button is-info" role="button">Создать новую запись</a></p><br />
+    <table class="table small is-striped">
+        <thead>
+            <th>Имя
+                <!--				<a href="javascript:;">
                             Логин
                             <span class="sorter asc">
                                 <span class="caret-up"></span>
                                 <span class="caret-down"></span>
                             </span>
                     </a>-->
-			   </th><th>Права доступа</th><th>Подразделение</th><th>E-mail</th><th>Дата/время создания</th><th>Состояние</th><th>Пароль</th><th>Кем создан</th></thead>	
+            </th>
+            <th>Права доступа</th>
+            <th>Подразделение</th>
+            <th>E-mail</th>
+            <th>Дата/время создания</th>
+            <th>Состояние</th>
+            <th>Дата/время изменения пароля</th>
+            <th>Кем создана</th>
+        </thead>
+        {{ range .Items}}
+        <tr>
+            <td><a href="/edituser/{{ .Name }}/">{{ .Name }}</a></td>
+            <td>{{ .Permission }}</td>
+            <td>{{ .Subdivision }}</td>
+            <td>{{ .Mail }}</td>
+            <td>{{ .CreatedTimestamp }}</td>
+            <td>{{ .Status }}</td>
+            <td>{{ .PasswordSetTimestamp }}</td>
+            <td>{{ .CreatedBy }}</td>
+        </tr>
+        {{ end}}
+    </table>
+</div>

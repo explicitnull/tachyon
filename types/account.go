@@ -1,44 +1,25 @@
 package types
 
 type Account struct {
-	Name        string
-	Password    string
-	Subdivision string
-	Permission  string
-	Mail        string
-
-	SubdivID int
-	PermisID int
-
-	Status string
-
-	CreatedTimestamp string
-	CreatedBy        string
-
+	Name                 string
+	Cleartext            string
+	Hash                 string
+	Subdivision          string
+	Permission           string
+	Mail                 string
+	Status               string
+	CreatedTimestamp     string
+	CreatedBy            string
 	PasswordSetTimestamp string
+
+	SubdivisionID    int
+	PermissionID     int
+	SubdivisionsList []string
+	PermissionsList  []string
 }
 
-type AccountTemplateData struct {
-	Id        int
-	Name      string
-	Hash      string // Password has
-	Cleartext string
-	Subdiv    string
-	Prm       string
-	Mail      string
-
-	Active     bool
-	ActiveSt   string
-	ActiveBox  string // Is "checked" or "" for HTML form
-	CreaTime   string // Full time form
-	CreaTimeS  string // Short time form
-	CreaBy     string
-	PassChd    bool
-	SubdivList []string
-	PrmList    []string
-}
-
-type TemplateAccountsSummary struct {
+type Accounts struct {
+	Items  []*Account
 	Total  int
 	Active int
 }

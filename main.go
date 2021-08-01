@@ -74,9 +74,9 @@ func main() {
 	r.HandleFunc("/newuser/", g.CreateUser).Methods("GET")
 	r.HandleFunc("/newuser/", g.CreateUserAction).Methods("POST")
 	r.HandleFunc("/edituser/{name}/", g.EditAccount).Methods("GET")
-	r.HandleFunc("/edituser/{id:[0-9]+}/", g.EditAccountAction).Methods("POST")
+	r.HandleFunc("/edituser/{name}/", g.EditAccountAction).Methods("POST")
 
-	// mx.HandleFunc("/permissions/", showPrm)
+	r.HandleFunc("/permissions/", g.ShowPermissions)
 	r.HandleFunc("/newpermission/", g.CreatePermission).Methods("GET")
 	r.HandleFunc("/newpermission/", g.CreatePermissionAction).Methods("POST")
 	// r.HandleFunc("/editpermission/{id}/", editPermission).Methods("GET")
