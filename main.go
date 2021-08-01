@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 	"os"
-	"tachyon-web/handler"
-	"tachyon-web/middleware"
-	"tachyon-web/options"
+	"tacasa-web/handler"
+	"tacasa-web/middleware"
+	"tacasa-web/options"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/gorilla/mux"
@@ -75,6 +75,7 @@ func main() {
 	r.HandleFunc("/newuser/", g.CreateUserAction).Methods("POST")
 	r.HandleFunc("/edituser/{name}/", g.EditAccount).Methods("GET")
 	r.HandleFunc("/edituser/{name}/", g.EditAccountAction).Methods("POST")
+	// r.HandleFunc("/removeuser/{id:[0-9]+}/", remUser)
 
 	r.HandleFunc("/permissions/", g.ShowPermissions)
 	r.HandleFunc("/newpermission/", g.CreatePermission).Methods("GET")
@@ -82,7 +83,6 @@ func main() {
 	// r.HandleFunc("/editpermission/{id}/", editPermission).Methods("GET")
 	// r.HandleFunc("/editpermission/{id}/", editPermissionAction).Methods("POST")
 
-	// r.HandleFunc("/removeuser/{id:[0-9]+}/", remUser)
 	// r.HandleFunc("/acct/", showAcct)
 	// r.HandleFunc("/acct-search/", searchAcct)
 

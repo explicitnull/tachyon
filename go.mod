@@ -1,4 +1,4 @@
-module tachyon-web
+module tacasa-web
 
 go 1.16
 

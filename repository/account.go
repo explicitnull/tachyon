@@ -2,10 +2,9 @@ package repository
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"strconv"
-	"tachyon-web/types"
+	"tacasa-web/types"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go"
@@ -13,7 +12,6 @@ import (
 )
 
 const (
-	namespace   = "tacacs"
 	accountsSet = "users"
 )
 
@@ -51,20 +49,6 @@ func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string
 	}
 
 	return "", nil
-}
-
-func panicOnError(err error) {
-	if err != nil {
-		panic(err)
-	}
-}
-
-func printOK(format string, a ...interface{}) {
-	fmt.Printf("ok: "+format+"\n", a...)
-}
-
-func printError(format string, a ...interface{}) {
-	fmt.Printf("error: "+format+"\n", a...)
 }
 
 func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail, createdBy string, permisID, subdivID int) error {
@@ -108,53 +92,14 @@ type Metrics struct {
 var setMap = make(map[string]Metrics)
 
 func GetUsers(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Account, error) {
-	result := make([]*types.Account, 0)
-
-	policy := aerospike.NewScanPolicy()
-	policy.RecordsPerSecond = 1000
-
-	nodeList := aclient.GetNodes()
 	begin := time.Now()
 
-	recs := make([]*aerospike.Record, 0)
-
-	for _, node := range nodeList {
-		le.Debug("scan node ", node.GetName())
-		recordset, err := aclient.ScanNode(policy, node, namespace, accountsSet)
-		if err != nil {
-			return nil, err
-		}
-
-	L:
-		for {
-			select {
-			case rec := <-recordset.Records:
-				if rec == nil {
-					break L
-				}
-
-				metrics, exists := setMap[rec.Key.SetName()]
-
-				if !exists {
-					metrics = Metrics{}
-				}
-				metrics.count++
-				metrics.total++
-				setMap[rec.Key.SetName()] = metrics
-
-				recs = append(recs, rec)
-
-			case <-recordset.Errors:
-				// if there was an error, stop
-				panicOnError(err)
-			}
-		}
-
-		for k, v := range setMap {
-			log.Println("Node ", node, " accountsSet ", k, " count: ", v.count)
-			v.count = 0
-		}
+	recs, err := getAllRecords(aclient, accountsSet)
+	if err != nil {
+		return nil, err
 	}
+
+	result := make([]*types.Account, 0)
 
 	for _, v := range recs {
 		acc, err := extractAccount(v.Bins)
@@ -223,38 +168,6 @@ func SetPermission(name string, perm string) error {
 
 func SetMail(name string, mail string) error {
 	return nil
-}
-
-func extractString(bins aerospike.BinMap, bin string) (string, error) {
-	passI, ok := bins[bin]
-	if ok {
-		pass, ok := passI.(string)
-		if ok {
-			return pass, nil
-		} else {
-			fmt.Println("BinMap value is not string")
-		}
-	} else {
-		fmt.Println("failed to get value from BinMap")
-	}
-
-	return "", nil
-}
-
-func extractInt(bins aerospike.BinMap, bin string) (int, error) {
-	passI, ok := bins[bin]
-	if ok {
-		pass, ok := passI.(int)
-		if ok {
-			return pass, nil
-		} else {
-			fmt.Println("BinMap value is not integer")
-		}
-	} else {
-		fmt.Println("failed to get value from BinMap")
-	}
-
-	return 0, nil
 }
 
 func extractAccount(bins aerospike.BinMap) (*types.Account, error) {

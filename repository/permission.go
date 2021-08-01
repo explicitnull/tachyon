@@ -1,8 +1,7 @@
 package repository
 
 import (
-	"log"
-	"tachyon-web/types"
+	"tacasa-web/types"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go"
@@ -12,50 +11,9 @@ import (
 const permissionsSet = "permissions"
 
 func GetPermissions(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Permission, error) {
-	policy := aerospike.NewScanPolicy()
-	policy.RecordsPerSecond = 1000
-
-	nodeList := aclient.GetNodes()
-	begin := time.Now()
-
-	recs := make([]*aerospike.Record, 0)
-
-	for _, node := range nodeList {
-		le.Debug("scan node ", node.GetName())
-		recordset, err := aclient.ScanNode(policy, node, namespace, permissionsSet)
-		if err != nil {
-			return nil, err
-		}
-
-	L:
-		for {
-			select {
-			case rec := <-recordset.Records:
-				if rec == nil {
-					break L
-				}
-
-				metrics, exists := setMap[rec.Key.SetName()]
-
-				if !exists {
-					metrics = Metrics{}
-				}
-				metrics.count++
-				metrics.total++
-				setMap[rec.Key.SetName()] = metrics
-
-				recs = append(recs, rec)
-
-			case <-recordset.Errors:
-				// if there was an error, stop
-				panicOnError(err)
-			}
-		}
-
-		for k, v := range setMap {
-			log.Println("Node ", node, " permissionsSet ", k, " count: ", v.count)
-			v.count = 0
-		}
+	recs, err := getAllRecords(aclient, accountsSet)
+	if err != nil {
+		return nil, err
 	}
 
 	result := make([]*types.Permission, 0)
@@ -69,10 +27,6 @@ func GetPermissions(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Permi
 
 		result = append(result, perm)
 	}
-
-	end := time.Now()
-	seconds := float64(end.Sub(begin)) / float64(time.Second)
-	log.Println("Elapsed time: ", seconds, " seconds")
 
 	return result, nil
 }

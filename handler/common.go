@@ -6,7 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
-	"tachyon-web/types"
+	"tacasa-web/types"
 
 	"github.com/sirupsen/logrus"
 )

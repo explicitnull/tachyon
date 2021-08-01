@@ -3,8 +3,8 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"tachyon-web/repository"
-	"tachyon-web/types"
+	"tacasa-web/repository"
+	"tacasa-web/types"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/dchest/uniuri"

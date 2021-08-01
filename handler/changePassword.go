@@ -6,8 +6,8 @@ import (
 	"html/template"
 	"net/http"
 	"regexp"
-	"tachyon-web/options"
-	"tachyon-web/repository"
+	"tacasa-web/options"
+	"tacasa-web/repository"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"

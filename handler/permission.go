@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
-	"tachyon-web/repository"
-	"tachyon-web/types"
+	"tacasa-web/repository"
+	"tacasa-web/types"
 )
 
 type PermissionCreated struct {

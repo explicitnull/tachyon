@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"tachyon-web/options"
+	"tacasa-web/options"
 
 	"github.com/gorilla/securecookie"
 )
