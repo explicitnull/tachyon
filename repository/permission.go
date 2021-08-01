@@ -11,7 +11,7 @@ import (
 const permissionsSet = "permissions"
 
 func GetPermissions(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Permission, error) {
-	recs, err := getAllRecords(aclient, accountsSet)
+	recs, err := getAllRecords(aclient, permissionsSet)
 	if err != nil {
 		return nil, err
 	}

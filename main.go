@@ -67,6 +67,7 @@ func main() {
 	r.HandleFunc("/login/", g.LoginAction).Methods("POST")
 	r.HandleFunc("/logout/", g.Logout)
 
+	// tacplus configuration management handlers
 	r.HandleFunc("/passwd/", g.ChangePassword).Methods("GET")
 	r.HandleFunc("/passwd/", g.ChangePasswordAction).Methods("POST")
 
@@ -83,15 +84,19 @@ func main() {
 	// r.HandleFunc("/editpermission/{id}/", editPermission).Methods("GET")
 	// r.HandleFunc("/editpermission/{id}/", editPermissionAction).Methods("POST")
 
-	// r.HandleFunc("/acct/", showAcct)
+	r.HandleFunc("/subdiv/", g.ShowSubdivisions)
+
+	r.HandleFunc("/equipment/", g.ShowEquipment)
+
+	// tacplus logs handlers
+	r.HandleFunc("/auth/", g.ShowAuthenticationLog)
+	r.HandleFunc("/acct/", g.ShowAccountingLog)
 	// r.HandleFunc("/acct-search/", searchAcct)
 
-	// mx.HandleFunc("/equipment/", showEqp)
-	// mx.HandleFunc("/lockout/", showLock)
-	// mx.HandleFunc("/auth/", showAuth)
+	// antibruteforce handler
+	r.HandleFunc("/lockout/", g.ShowLockout)
+
 	// mx.HandleFunc("/adm/", adm)
-	// mx.HandleFunc("/subdiv/", showSubdiv)
-	// mx.HandleFunc("/log/", showLog)
 
 	r.Use(m.Log)
 	r.Use(m.CheckCookie)
