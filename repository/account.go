@@ -84,13 +84,6 @@ func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail
 	return nil
 }
 
-type Metrics struct {
-	count int
-	total int
-}
-
-var setMap = make(map[string]Metrics)
-
 func GetUsers(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Account, error) {
 	begin := time.Now()
 

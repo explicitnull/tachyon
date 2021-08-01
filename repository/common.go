@@ -9,6 +9,13 @@ import (
 
 const namespace = "tacacs"
 
+type Metrics struct {
+	count int
+	total int
+}
+
+var setMap = make(map[string]Metrics)
+
 func panicOnError(err error) {
 	if err != nil {
 		panic(err)
@@ -64,7 +71,6 @@ func getAllRecords(aclient *aerospike.Client, setName string) ([]*aerospike.Reco
 	records := make([]*aerospike.Record, 0)
 
 	for _, node := range nodeList {
-		fmt.Println("scan node ", node.GetName())
 		recordset, err := aclient.ScanNode(policy, node, namespace, setName)
 		if err != nil {
 			return nil, err
@@ -95,7 +101,7 @@ func getAllRecords(aclient *aerospike.Client, setName string) ([]*aerospike.Reco
 		}
 
 		for k, v := range setMap {
-			log.Println("Node ", node, " accountsSet ", k, " count: ", v.count)
+			log.Println("Node ", node, " set ", k, " count: ", v.count)
 			v.count = 0
 		}
 	}
