@@ -1,9 +1,30 @@
-            <h3 class="test-header">Лог аутентификации</h3>
-  	    <div class="test-body">
-	        <table class="table small">
+<h3 class="test-header">Authentication log</h3>
+<div class="test-body">
+	<table class="table">
 		<p>БД обновляется раз в 5 минут. Записей в БД: {{.Total}}</p>
 		<p>Данные за последние 60 минут:</p>
-	            <thead><th>Время UTC</th><th>Пользователь</th><th>IP устройства</th><th>Hostname</th><th>Событие</th><th>IP пользователя</th></thead>
+		<thead>
+			<th>ID</th>
+			<th>Timestamp</th>
+			<th>Account name</th>
+			<th>Device IP</th>
+			<th>Device name</th>
+			<th>Event type</th>
+			<th>User IP</th>
+		</thead>
+		{{ range .Items}}
+		<tr>
+			<td>{{ .ID }}</td>
+			<td>{{ .Timestamp }}</td>
+			<td>{{ .AccountName }}</td>
+			<td>{{ .DeviceIP }}</td>
+			<td>{{ .DeviceName }}</td>
+			<td>{{ .EventType }}</td>
+			<td>{{ .UserIP }}</td>
+		</tr>
+		{{ end}}
+	</table>
+</div>
 <!--
 <h2>Лог аутентификации</h2></div>
 	    Обновляется каждые 5 минут.<br/>

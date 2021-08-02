@@ -89,12 +89,12 @@ func main() {
 	r.HandleFunc("/equipment/", g.ShowEquipment)
 
 	// tacplus logs handlers
-	r.HandleFunc("/auth/", g.ShowAuthenticationLog)
-	r.HandleFunc("/acct/", g.ShowAccountingLog)
+	r.HandleFunc("/auth/", g.ShowAuthentications)
+	r.HandleFunc("/acct/", g.ShowAccounting)
 	// r.HandleFunc("/acct-search/", searchAcct)
 
 	// antibruteforce handler
-	r.HandleFunc("/lockout/", g.ShowLockout)
+	r.HandleFunc("/lockout/", g.ShowLockouts)
 
 	// mx.HandleFunc("/adm/", adm)
 

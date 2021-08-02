@@ -1,8 +1,28 @@
-		<!-- 16 -->
-                <h3 class="test-header">Антибрутфорс</h3>
-                <div class="test-body">
-	            <table class="table small">
-	                <thead><th>IP атакующего</th><th>FQDN атакующего</th><th>Первая попытка</th><th>Последняя попытка</th></thead>
+<!-- 16 -->
+<h3 class="test-header">Antibruteforce</h3>
+<div class="test-body">
+	<table class="table">
+		<thead>
+			<th>Attacking IP address</th>
+			<th>Attacking FQDN</th>
+			<th>First attempt</th>
+			<th>Last attempt</th>
+			<th>Last device</th>
+			<th>Last account name</th>
+
+		</thead>
+		{{ range .Items}}
+		<tr>
+			<td>{{ .IP }}</td>
+			<td>{{ .FQDN }}</td>
+			<td>{{ .FirstAttemptTimestamp }}</td>
+			<td>{{ .LastAttemptTimestamp }}</td>
+			<td>{{ .LastDevice }}</td>
+			<td>{{ .LastAccountName }}</td>
+		</tr>
+		{{ end}}
+	</table>
+</div>
 <!--
 
 <h2>Антибрутфорс</h2></div>

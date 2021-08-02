@@ -64,17 +64,19 @@ func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail
 	// insert into tacacs.users (PK, username, pass, mail, subdiv_id, permis_id, created_by, created_ts, status, pass_set_ts) values ('test01', 'test01', 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg', 'ma@ti.ru', 2, 10, 'admin', '2009-01-02 18:00', 'active', '2021-07-01 13:00')
 
 	// NOTE: bin name must be less than 16 characters
-	bin1 := aerospike.NewBin("username", username)
-	bin2 := aerospike.NewBin("pass", hash)
-	bin3 := aerospike.NewBin("mail", mail)
-	bin4 := aerospike.NewBin("createdBy", createdBy)
-	bin5 := aerospike.NewBin("permisID", permisID)
-	bin6 := aerospike.NewBin("subdivID", subdivID)
-	bin7 := aerospike.NewBin("createdTs", time.Now().Unix())
+	bins := aerospike.BinMap{
+		"username":  username,
+		"pass":      hash,
+		"mail":      mail,
+		"createdBy": createdBy,
+		"permisID":  permisID,
+		"subdivID":  subdivID,
+		"createdTs": time.Now().Unix(),
+	}
 
 	policy := aerospike.NewWritePolicy(0, 0)
 
-	err = client.PutBins(policy, key, bin1, bin2, bin3, bin4, bin5, bin6, bin7)
+	err = client.Put(policy, key, bins)
 	if err != nil {
 		return err
 	}

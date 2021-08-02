@@ -16,16 +16,16 @@
                   <thead><th>Время UTC</th><th>Пользователь</th><th>IP устройства</th><th>Hostname</th><th>Команда</th><th>IP пользователя</th></thead>
 
 -->
-	  <h5 class="test-header">Лог аккаунтинга</h5>
-          <div class="test-body align-left">
-              <p class="align-left">БД обновляется раз в 5 минут. Записей в БД: {{.Total}}</p>
-          </div>
-  
-      </div>
-      <div class="test-demo">
+<h5 class="test-header">Accounting log</h5>
+<div class="test-body align-left">
+    <p class="align-left">БД обновляется раз в 5 минут. Записей в БД: {{.Total}}</p>
+</div>
 
-          <div class="test-body">
-          <form action="/acct-search/" class="form--inline" method="post">
+</div>
+<div class="test-demo">
+
+    <div class="test-body">
+        <form action="/acct-search/" class="form--inline" method="post">
             <fieldset class="no-legend">
                 <ol class="fields">
                     <li>
@@ -43,12 +43,12 @@
                     <li>
                         <label class="field-label">Ограничить по времени</label>
                         <input type="text" class="input" value="-infinity" name="from">
-			<input type="text" class="input" value="infinity" name="to">
+                        <input type="text" class="input" value="infinity" name="to">
                         <div class="field-help">(в формате 2017-01-01 00:00:00)</div>
                     </li>
                 </ol>
             </fieldset>
-<!--
+            <!--
             <fieldset>
                 <legend>Fieldset with legend</legend>
 
@@ -65,12 +65,36 @@
                 <button type="reset" class="button">Сбросить</button>
             </div>
         </form>
-	<p>Будут показано только первые 50 тысяч строк. Для поиска по маске используйте знак '%', вводите время в формате '2017-01-01 00:00:00'.</p>
+        <p>Будут показано только первые 50 тысяч строк. Для поиска по маске используйте знак '%', вводите время в
+            формате '2017-01-01 00:00:00'.</p>
     </div>
 </div>
-      <div class="test-demo">
-          <div class="test-body">
-              <p class="align-left">Данные за последние 10 минут:</p>
-              <table class="table small align-left">
-                  <thead><th>Время UTC</th><th>Пользователь</th><th>IP устройства</th><th>Hostname</th><th>Команда</th><th>IP пользователя</th></thead>
-	</div>
+<div class="test-demo">
+    <div class="test-body">
+        <p class="align-left">Данные за последние 10 минут:</p>
+        <table class="table align-left">
+            <thead>
+                <th>ID</th>
+                <th>Timestamp</th>
+                <th>Device IP</th>
+                <th>Device name</th>
+                <th>Account name</th>
+                <th>User IP</th>
+                <th>User IP NS PTR</th>
+                <th>Command</th>
+            </thead>
+            {{ range .Items}}
+            <tr>
+                <td>{{ .ID }}</td>
+                <td>{{ .Timestamp }}</td>
+                <td>{{ .DeviceIP }}</td>
+                <td>{{ .DeviceName }}</td>
+                <td>{{ .AccountName }}</td>
+                <td>{{ .UserIP }}</td>
+                <td>{{ .UserFQDN }}</td>
+                <td>{{ .Command }}</td>
+            </tr>
+            {{ end}}
+        </table>
+    </div>
+</div>

@@ -6,7 +6,7 @@ import (
 	"tacasa-web/types"
 )
 
-func (g *Gateway) ShowLockout(w http.ResponseWriter, r *http.Request) {
+func (g *Gateway) ShowLockouts(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
@@ -22,15 +22,15 @@ func (g *Gateway) ShowLockout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, _ := repository.GetSubdivisions(le, g.aerospikeClient)
+	items, _ := repository.GetLockouts(le, g.aerospikeClient)
 
-	subdivs := &types.Subdivisions{
+	lockouts := &types.Lockouts{
 		Items: items,
 	}
 
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	executeTemplate(le, w, "lockout.htm", subdivs)
+	executeTemplate(le, w, "lockout.htm", lockouts)
 
 	executeFooterTemplate(le, w)
 }

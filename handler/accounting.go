@@ -6,7 +6,7 @@ import (
 	"tacasa-web/types"
 )
 
-func (g *Gateway) ShowAccountingLog(w http.ResponseWriter, r *http.Request) {
+func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
@@ -22,15 +22,15 @@ func (g *Gateway) ShowAccountingLog(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, _ := repository.GetSubdivisions(le, g.aerospikeClient)
+	items, _ := repository.GetAccounting(le, g.aerospikeClient)
 
-	subdivs := &types.Subdivisions{
+	acct := &types.AccountingRecs{
 		Items: items,
 	}
 
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	executeTemplate(le, w, "acct.htm", subdivs)
+	executeTemplate(le, w, "acct.htm", acct)
 
 	executeFooterTemplate(le, w)
 }
