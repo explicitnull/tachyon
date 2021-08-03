@@ -10,10 +10,10 @@ type Account struct {
 	Status               string
 	CreatedTimestamp     string
 	CreatedBy            string
-	PasswordSetTimestamp string
+	PasswordSetTimestamp string // new
 
-	SubdivisionID    int
-	PermissionID     int
+	SubdivisionID    int // new
+	PermissionID     int // new
 	SubdivisionsList []string
 	PermissionsList  []string
 }

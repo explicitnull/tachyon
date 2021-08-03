@@ -68,10 +68,10 @@ func main() {
 	r.HandleFunc("/logout/", g.Logout)
 
 	// tacplus configuration management handlers
-	r.HandleFunc("/passwd/", g.ChangePassword).Methods("GET")
-	r.HandleFunc("/passwd/", g.ChangePasswordAction).Methods("POST")
+	r.HandleFunc("/myaccount/", g.ChangePassword).Methods("GET")
+	r.HandleFunc("/myaccount/", g.ChangePasswordAction).Methods("POST")
 
-	r.HandleFunc("/users/", g.ShowUsers)
+	r.HandleFunc("/users/", g.ShowAccounts)
 	r.HandleFunc("/newuser/", g.CreateUser).Methods("GET")
 	r.HandleFunc("/newuser/", g.CreateUserAction).Methods("POST")
 	r.HandleFunc("/edituser/{name}/", g.EditAccount).Methods("GET")

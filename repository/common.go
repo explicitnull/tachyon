@@ -1,20 +1,20 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
-	"log"
 
 	"github.com/aerospike/aerospike-client-go"
 )
 
 const namespace = "tacacs"
 
-type Metrics struct {
-	count int
-	total int
-}
+// type Metrics struct {
+// 	count int
+// 	total int
+// }
 
-var setMap = make(map[string]Metrics)
+// var setMap = make(map[string]Metrics)
 
 func panicOnError(err error) {
 	if err != nil {
@@ -31,35 +31,31 @@ func printError(format string, a ...interface{}) {
 }
 
 func extractString(bins aerospike.BinMap, bin string) (string, error) {
-	passI, ok := bins[bin]
-	if ok {
-		pass, ok := passI.(string)
-		if ok {
-			return pass, nil
-		} else {
-			fmt.Println("BinMap value is not string")
-		}
-	} else {
-		fmt.Println("failed to get value from BinMap")
+	valueI, ok := bins[bin]
+	if !ok {
+		return "", errors.New("failed to get value from BinMap for key " + bin)
 	}
 
-	return "", nil
+	value, ok := valueI.(string)
+	if !ok {
+		return "", errors.New("BinMap value is not string")
+	}
+
+	return value, nil
 }
 
 func extractInt(bins aerospike.BinMap, bin string) (int, error) {
-	passI, ok := bins[bin]
-	if ok {
-		pass, ok := passI.(int)
-		if ok {
-			return pass, nil
-		} else {
-			fmt.Println("BinMap value is not integer")
-		}
-	} else {
-		fmt.Println("failed to get value from BinMap")
+	valueI, ok := bins[bin]
+	if !ok {
+		return 0, errors.New("failed to get value from BinMap for key " + bin)
 	}
 
-	return 0, nil
+	value, ok := valueI.(int)
+	if !ok {
+		return 0, errors.New("BinMap value is not integer")
+	}
+
+	return value, nil
 }
 
 func getAllRecords(aclient *aerospike.Client, setName string) ([]*aerospike.Record, error) {
@@ -84,14 +80,14 @@ func getAllRecords(aclient *aerospike.Client, setName string) ([]*aerospike.Reco
 					break L
 				}
 
-				metrics, exists := setMap[record.Key.SetName()]
+				// metrics, exists := setMap[record.Key.SetName()]
 
-				if !exists {
-					metrics = Metrics{}
-				}
-				metrics.count++
-				metrics.total++
-				setMap[record.Key.SetName()] = metrics
+				// if !exists {
+				// 	metrics = Metrics{}
+				// }
+				// metrics.count++
+				// metrics.total++
+				// setMap[record.Key.SetName()] = metrics
 
 				records = append(records, record)
 
@@ -100,10 +96,10 @@ func getAllRecords(aclient *aerospike.Client, setName string) ([]*aerospike.Reco
 			}
 		}
 
-		for k, v := range setMap {
-			log.Println("Node ", node, " set ", k, " count: ", v.count)
-			v.count = 0
-		}
+		// for k, v := range setMap {
+		// 	log.Println("Node ", node, " set ", k, " count: ", v.count)
+		// 	v.count = 0
+		// }
 	}
 
 	return records, nil

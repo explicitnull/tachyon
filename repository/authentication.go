@@ -10,13 +10,13 @@ import (
 
 const authenticationsSet = "authentications"
 
-func GetAuthentications(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Authentication, error) {
+func GetAuthentications(le *logrus.Entry, aclient *aerospike.Client) ([]types.Authentication, error) {
 	recs, err := getAllRecords(aclient, authenticationsSet)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make([]*types.Authentication, 0)
+	result := make([]types.Authentication, 0)
 
 	for _, v := range recs {
 		auth, err := extractAuthentication(v.Bins)
@@ -28,52 +28,53 @@ func GetAuthentications(le *logrus.Entry, aclient *aerospike.Client) ([]*types.A
 		result = append(result, auth)
 	}
 
+	le.Debugf("authentication found: %d", len(result))
 	return result, nil
 }
 
-func extractAuthentication(bins aerospike.BinMap) (*types.Authentication, error) {
-	auth := &types.Authentication{}
+func extractAuthentication(bins aerospike.BinMap) (types.Authentication, error) {
+	auth := types.Authentication{}
 
 	var err error
 
 	auth.ID, err = extractString(bins, "id")
 	if err != nil {
-		return nil, err
+		return types.Authentication{}, err
 	}
 
 	auth.Timestamp, err = extractString(bins, "ts")
 	if err != nil {
-		return nil, err
+		return types.Authentication{}, err
 	}
 
 	auth.AccountName, err = extractString(bins, "account")
 	if err != nil {
-		return nil, err
+		return types.Authentication{}, err
 	}
 
 	auth.DeviceIP, err = extractString(bins, "device_ip")
 	if err != nil {
-		return nil, err
+		return types.Authentication{}, err
 	}
 
 	auth.DeviceName, err = extractString(bins, "device_name")
 	if err != nil {
-		return nil, err
+		return types.Authentication{}, err
 	}
 
 	auth.EventType, err = extractString(bins, "event_type")
 	if err != nil {
-		return nil, err
+		return types.Authentication{}, err
 	}
 
 	auth.UserIP, err = extractString(bins, "user_ip")
 	if err != nil {
-		return nil, err
+		return types.Authentication{}, err
 	}
 
 	auth.UserFQDN, err = extractString(bins, "user_fqdn")
 	if err != nil {
-		return nil, err
+		return types.Authentication{}, err
 	}
 
 	return auth, nil

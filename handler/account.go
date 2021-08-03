@@ -12,7 +12,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
+func (g *Gateway) ShowAccounts(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
@@ -28,7 +28,12 @@ func (g *Gateway) ShowUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, _ := repository.GetUsers(le, g.aerospikeClient)
+	items, err := repository.GetAccounts(le, g.aerospikeClient)
+	if err != nil {
+		le.WithError(err).Error("getting accounts failed")
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
 
 	accounts := &types.Accounts{
 		Items:  items,

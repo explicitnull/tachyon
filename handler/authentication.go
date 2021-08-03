@@ -16,15 +16,21 @@ func (g *Gateway) ShowAuthentications(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, _ := repository.GetAuthentications(le, g.aerospikeClient)
+	items, err := repository.GetAuthentications(le, g.aerospikeClient)
+	if err != nil {
+		le.WithError(err).Error("getting authentications failed")
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
 
-	auth := &types.Authentications{
+	auts := types.Authentications{
 		Items: items,
 	}
 
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	executeTemplate(le, w, "auth.htm", auth)
+	le.Debugf("%#v", auts)
+	executeTemplate(le, w, "auth.htm", auts)
 
 	executeFooterTemplate(le, w)
 }
