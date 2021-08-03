@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Access Management</title>
+    <title>Tacasa Manager</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <link href="//fonts.googleapis.com/css?family=Droid+Sans:400,700" media="screen" rel="stylesheet" type="text/css">
@@ -26,33 +26,35 @@
 
 <body>
     <header id="head" class="test-bar clear-fix">
-        <div class="bar-right">Logged in as <b>{{.Name}}</b> <a href="/logout/" style="color: #ffffff">[Logout]</a>
+        <div class="bar-right">Logged in as <a href="/passwd/" style="color: #ffffff"><b>{{.Name}}</b></a> <a href="/logout/" style="color: #ffffff">[Logout]</a>
         </div>
     </header>
     <div id="skeleton" class="body">
         <div class="test-demo">
             <div class="test-body full">
                 <div class="button-group round button-group--justified" role="toolbar">
-                    <button type="button" class="button" role="button" onclick="javascript:location.href='/passwd/'"
-                        {{.Item1}}>Изменить пароль</button>
-                    <button type="button" class="button" role="button" onclick="javascript:location.href='/equipment/'"
-                        {{.Item2}}>Оборудование</button>
-                    <button type="button" class="button" role="button" onclick="javascript:location.href='/lockout/'"
-                        {{.Item3}}>Антибрутфорс</button>
-                    <button type="button" class="button" role="button" onclick="javascript:location.href='/subdiv/'"
-                        {{.Item4}}>Подразделения</button>
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/users/'"
-                        {{.Item5}}>Пользователи</button>
-                    <button type="button" class="button" role="button"
-                        onclick="javascript:location.href='/permissions/'" {{.Item6}}>Права доступа</button>
+                        {{.Item5}}>Accounts</button>
+                    <button type="button" class="button" role="button" onclick="javascript:location.href='/permissions/'"
+                        {{.Item6}}>Permissions</button>
+                    <button type="button" class="button" role="button" onclick="javascript:location.href='/subdiv/'"
+                        {{.Item4}}>Subdivisions</button>
+                    <button type="button" class="button" role="button" onclick="javascript:location.href='/lockout/'"
+                        {{.Item3}}>Anti-bruteforce</button>
+<!--
+                        <button type="button" class="button" role="button" onclick="javascript:location.href='/equipment/'"
+                        {{.Item2}}>Оборудование</button>
+-->
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/auth/'"
-                        {{.Item7}}>Аутентификация</button>
+                        {{.Item7}}>Authentication log</button>
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/acct/'"
-                        {{.Item8}}>Аккаунтинг</button>
+                        {{.Item8}}>Accounting log</button>
+<!-- 
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/log/'"
                         {{.Item9}}>Лог</button>
+-->
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/adm/'"
-                        {{.Item10}}>Управление комплексом</button>
+                        {{.Item10}}>Tacasa settings</button>
                 </div>
             </div>
             <!--<div id="skeleton" class="body">
