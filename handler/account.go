@@ -3,8 +3,8 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"tacasa-web/repository"
-	"tacasa-web/types"
+	"tacacs-webconsole/repository"
+	"tacacs-webconsole/types"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/dchest/uniuri"

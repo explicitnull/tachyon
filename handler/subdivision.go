@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
-	"tacasa-web/repository"
-	"tacasa-web/types"
+	"tacacs-webconsole/repository"
+	"tacacs-webconsole/types"
 )
 
 func (g *Gateway) ShowSubdivisions(w http.ResponseWriter, r *http.Request) {

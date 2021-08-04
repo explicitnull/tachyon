@@ -1,4 +1,4 @@
-module tacasa-web
+module tacacs-webconsole
 
 go 1.16
 

@@ -1,11 +1,11 @@
 <script src="js/demo.js"></script>
-<h3 class="test-header">Учетные записи</h3>
+<h3 class="test-header">Accounts</h3>
 <div class="test-body">
-    <p><a href="/newuser/" class="button is-info" role="button">Создать новую запись</a></p><br />
-    <p>Всего записей: {{.Total}}, из них активно: {{.Active}}.</p>
+    <p><a href="/newuser/" class="button is-info" role="button">Create new</a></p><br />
+    <!-- <p>Всего записей: {{.Total}}, из них активно: {{.Active}}.</p> -->
     <table class="table is-striped">
         <thead>
-            <th>Имя
+            <th>Name
                 <!--				<a href="javascript:;">
                             Логин
                             <span class="sorter asc">
@@ -14,22 +14,22 @@
                             </span>
                     </a>-->
             </th>
-            <th>Права доступа</th>
-            <th>Подразделение</th>
+            <th>Subdivision</th>
+            <th>Permission</th>
             <th>E-mail</th>
-            <th>Дата/время создания</th>
-            <th>Состояние</th>
-            <th>Дата/время изменения пароля</th>
-            <th>Кем создана</th>
+            <th>Status</th>
+            <th>Created timestamp</th>
+            <th>Password change timestamp</th>
+            <th>CreatedBy</th>
         </thead>
         {{ range .Items}}
         <tr>
             <td><a href="/edituser/{{ .Name }}/">{{ .Name }}</a></td>
-            <td>{{ .Permission }}</td>
             <td>{{ .Subdivision }}</td>
+            <td>{{ .Permission }}</td>
             <td>{{ .Mail }}</td>
-            <td>{{ .CreatedTimestamp }}</td>
             <td>{{ .Status }}</td>
+            <td>{{ .CreatedTimestamp }}</td>
             <td>{{ .PasswordSetTimestamp }}</td>
             <td>{{ .CreatedBy }}</td>
         </tr>

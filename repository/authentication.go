@@ -2,7 +2,7 @@
 package repository
 
 import (
-	"tacasa-web/types"
+	"tacacs-webconsole/types"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"

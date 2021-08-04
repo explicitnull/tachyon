@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"tacasa-web/options"
+	"tacacs-webconsole/options"
 
 	"github.com/gorilla/securecookie"
 )

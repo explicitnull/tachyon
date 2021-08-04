@@ -6,7 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
-	"tacasa-web/types"
+	"tacacs-webconsole/types"
 
 	"github.com/sirupsen/logrus"
 )
@@ -49,7 +49,7 @@ func executeHeaderTemplate(le *logrus.Entry, w http.ResponseWriter, username str
 
 	// TODO: what is this?
 	if username == "furai" {
-		header.Item10 = "disabled"
+		header.Item4 = "disabled"
 	}
 
 	hdr.Execute(w, header)

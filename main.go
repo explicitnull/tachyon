@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 	"os"
-	"tacasa-web/handler"
-	"tacasa-web/middleware"
-	"tacasa-web/options"
+	"tacacs-webconsole/handler"
+	"tacacs-webconsole/middleware"
+	"tacacs-webconsole/options"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/gorilla/mux"
