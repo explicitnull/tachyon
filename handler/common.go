@@ -47,11 +47,6 @@ func executeHeaderTemplate(le *logrus.Entry, w http.ResponseWriter, username str
 		Name: username,
 	}
 
-	// TODO: what is this?
-	if username == "furai" {
-		header.Item4 = "disabled"
-	}
-
 	hdr.Execute(w, header)
 	if err != nil {
 		le.WithError(err).Error("template execution failed")

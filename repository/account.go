@@ -1,6 +1,5 @@
-// insert into tacacs.users (PK, id, username, pass, subdiv_id, permis_id, mail, status, created_ts, created_by, pass_set_ts) values ('furai', 'QgYhMfWWaLqg', 'furai', 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg', 2, 10, 'dmitry.zhargalov@rt.ru', 'pass_change_reqd', '2021-01-01 18:00', 'admin', '')
-// insert into tacacs.users (PK, id, username, pass, subdiv_id, permis_id, mail, status, created_ts, created_by, pass_set_ts) values ('mag', 'srC4Is0V1sFb', 'mag', 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg', 2, 10, 'anton.moroz@rt.ru', 'active', '2009-01-02 18:00', 'admin', '2021-07-01 13:00')
-
+// insert into tacacs.users (PK, id, username, pass, subdiv_id, permis_id, mail, status, created_ts, created_by, pass_set_ts) values ('furai', 'QgYhMfWWaLqg', 'furai', 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg', 2, 10, 'dmitry.zhargalov@rt.ru', 'pass_not_chd', '2021-01-01 18:00', 'admin', '')
+// insert into tacacs.users (PK, id, username, pass, subdiv_id, permis_id, mail, status, created_ts, created_by, pass_chd_ts, ui_role) values ('test09', 'srC4Is0V1sFb', 'test09', 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg', 2, 10, 'anton.moroz@rt.ru', 'suspended', '2009-01-02 18:00', 'furai', '2021-07-01 13:00', "manager")
 package repository
 
 import (
@@ -207,20 +206,26 @@ func extractAccount(bins aerospike.BinMap) (*types.Account, error) {
 		return nil, err
 	}
 
-	passwordSetTimestamp, err := extractString(bins, "pass_set_ts")
+	passwordChangedTimestamp, err := extractString(bins, "pass_chd_ts")
+	if err != nil {
+		return nil, err
+	}
+
+	uiRole, err := extractString(bins, "ui_role")
 	if err != nil {
 		return nil, err
 	}
 
 	acc := &types.Account{
-		Name:                 username,
-		Mail:                 mail,
-		Subdivision:          strconv.Itoa(subdivID),
-		Permission:           strconv.Itoa(permisID),
-		CreatedBy:            createdBy,
-		CreatedTimestamp:     createdTimestamp,
-		Status:               status,
-		PasswordSetTimestamp: passwordSetTimestamp,
+		Name:                     username,
+		Mail:                     mail,
+		Subdivision:              strconv.Itoa(subdivID),
+		Permission:               strconv.Itoa(permisID),
+		CreatedBy:                createdBy,
+		CreatedTimestamp:         createdTimestamp,
+		Status:                   status,
+		PasswordChangedTimestamp: passwordChangedTimestamp,
+		UIRole:                   uiRole,
 	}
 
 	return acc, nil

@@ -12,6 +12,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const defaultAccountsPerPageLimit = 10
+
 func (g *Gateway) ShowAccounts(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
@@ -35,15 +37,41 @@ func (g *Gateway) ShowAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// preparing response
 	accounts := &types.Accounts{
-		Items:  items,
-		Total:  0,
-		Active: 0,
+		Items:                        items,
+		TextStatusActive:             types.AccountStatusActive,
+		TextStatusPasswordNotChanged: types.AccountStatusPasswordNotChanged,
+		TextStatusSuspended:          types.AccountStatusSuspended,
+		MoreRecords:                  false,
+	}
+
+	// counting summary
+	for _, v := range items {
+		accounts.Total++
+
+		switch v.Status {
+		case types.AccountStatusActive:
+			accounts.Active++
+		case types.AccountStatusPasswordNotChanged:
+			accounts.PasswordNotChanged++
+		case types.AccountStatusSuspended:
+			accounts.Suspended++
+		}
+
+		// if v.LastSignedInTimestamp == "" {
+		// 	accounts.NeverSignedIn++
+		// }
+	}
+
+	if accounts.Total > defaultAccountsPerPageLimit {
+		accounts.MoreRecords = true
+		accounts.TextAccountsPerPageLimit = defaultAccountsPerPageLimit
 	}
 
 	executeHeaderTemplate(le, w, username)
 
-	executeTemplate(le, w, "users.htm", accounts)
+	executeTemplate(le, w, "accounts.htm", accounts)
 
 	executeFooterTemplate(le, w)
 }
@@ -80,7 +108,7 @@ func (g *Gateway) CreateUser(w http.ResponseWriter, r *http.Request) {
 	form.Opt1 = repository.GetSubdivisionsList(le, g.aerospikeClient)
 	form.Opt2 = repository.GetPermissionsList(le, g.aerospikeClient)
 
-	executeTemplate(le, w, "newuser.htm", form)
+	executeTemplate(le, w, "account_new.htm", form)
 
 	executeFooterTemplate(le, w)
 }

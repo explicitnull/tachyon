@@ -1,8 +1,7 @@
 <script src="js/demo.js"></script>
 <h3 class="test-header">Accounts</h3>
 <div class="test-body">
-    <p><a href="/newuser/" class="button is-info" role="button">Create new</a></p><br />
-    <!-- <p>Всего записей: {{.Total}}, из них активно: {{.Active}}.</p> -->
+    <p><a href="/newuser/" class="button round is-info" role="button">Create new</a></p><br />
     <table class="table is-striped">
         <thead>
             <th>Name
@@ -18,8 +17,8 @@
             <th>Permission</th>
             <th>E-mail</th>
             <th>Status</th>
-            <th>Created timestamp</th>
-            <th>Password change timestamp</th>
+            <th>Created</th>
+            <th>Password changed</th>
             <th>CreatedBy</th>
         </thead>
         {{ range .Items}}
@@ -30,9 +29,17 @@
             <td>{{ .Mail }}</td>
             <td>{{ .Status }}</td>
             <td>{{ .CreatedTimestamp }}</td>
-            <td>{{ .PasswordSetTimestamp }}</td>
+            <td>{{ .PasswordChangedTimestamp }}</td>
             <td>{{ .CreatedBy }}</td>
         </tr>
         {{ end}}
     </table>
+    <p>Total: {{ .Total }},
+        {{ .TextStatusActive }}: {{ .Active }},
+        {{ .TextStatusPasswordNotChanged}}: {{ .PasswordNotChanged }},
+        {{ .TextStatusSuspended}}: {{.Suspended }}</p>
+    {{ if .MoreRecords }}
+    <p>{{ .TextAccountsPerPageLimit }} newest records shown, <a href="/users/?limit=0">show all</a></p>
+    <!-- <p>{{ .TextAccountsPerPageLimit }} newest records shown, <a href="/users/?limit=0">show all</a></p> -->
+    {{end}}
 </div>
