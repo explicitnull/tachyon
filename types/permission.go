@@ -1,5 +1,8 @@
 package types
 
+const PermissionStatusActive = "active"
+const PermissionStatusInactive = "inactive"
+
 type Permission struct {
 	Id               int
 	Name             string
@@ -11,4 +14,8 @@ type Permission struct {
 
 type Permissions struct {
 	Items []*Permission
+
+	Total    int
+	Active   int
+	Inactive int
 }

@@ -32,9 +32,21 @@ func (g *Gateway) ShowPermissions(w http.ResponseWriter, r *http.Request) {
 		Items: items,
 	}
 
+	// counting summary
+	for _, v := range items {
+		perms.Total++
+
+		switch v.Status {
+		case types.PermissionStatusActive:
+			perms.Active++
+		case types.PermissionStatusInactive:
+			perms.Inactive++
+		}
+	}
+
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	executeTemplate(le, w, "prm.htm", perms)
+	executeTemplate(le, w, "permissions.htm", perms)
 
 	executeFooterTemplate(le, w)
 }

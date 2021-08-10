@@ -1,3 +1,5 @@
+// Feb  2 18:41:38	192.168.0.202	jathan	ttyp1	192.168.0.10	stop	task_id=3	service=shell	process*mgd[7741]	cmd=configure exclusive <cr>
+// insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('wTHCHKgRtpav', 'wTHCHKgRtpav', '2021-01-01 01:23', '10.10.10.10', 'device04', 'jathan', '45.67.89.90', 'reverse.example.com', 'configure exclusive <cr>')
 package repository
 
 import (

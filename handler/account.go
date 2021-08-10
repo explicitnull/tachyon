@@ -39,11 +39,8 @@ func (g *Gateway) ShowAccounts(w http.ResponseWriter, r *http.Request) {
 
 	// preparing response
 	accounts := &types.Accounts{
-		Items:                        items,
-		TextStatusActive:             types.AccountStatusActive,
-		TextStatusPasswordNotChanged: types.AccountStatusPasswordNotChanged,
-		TextStatusSuspended:          types.AccountStatusSuspended,
-		MoreRecords:                  false,
+		Items:     items,
+		MoreItems: false,
 	}
 
 	// counting summary
@@ -65,8 +62,8 @@ func (g *Gateway) ShowAccounts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if accounts.Total > defaultAccountsPerPageLimit {
-		accounts.MoreRecords = true
-		accounts.TextAccountsPerPageLimit = defaultAccountsPerPageLimit
+		accounts.MoreItems = true
+		accounts.ItemsPerPageLimit = defaultAccountsPerPageLimit
 	}
 
 	executeHeaderTemplate(le, w, username)

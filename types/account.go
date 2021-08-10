@@ -25,17 +25,14 @@ type Account struct {
 }
 
 type Accounts struct {
-	Items              []*Account
+	Items []*Account
+
 	Total              int
 	Active             int
 	PasswordNotChanged int
 	Suspended          int
 	NeverSignedIn      int
 
-	TextStatusActive             string
-	TextStatusPasswordNotChanged string
-	TextStatusSuspended          string
-
-	MoreRecords              bool
-	TextAccountsPerPageLimit int
+	MoreItems         bool
+	ItemsPerPageLimit int
 }

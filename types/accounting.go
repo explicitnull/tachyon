@@ -11,6 +11,11 @@ type AccountingRec struct {
 	Command     string
 }
 
-type AccountingRecs struct {
+type AccountingRecords struct {
 	Items []*AccountingRec
+
+	Total int
+
+	MoreItems         bool
+	ItemsPerPageLimit int
 }

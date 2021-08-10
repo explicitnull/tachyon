@@ -28,6 +28,18 @@ func (g *Gateway) ShowSubdivisions(w http.ResponseWriter, r *http.Request) {
 		Items: items,
 	}
 
+	// counting summary
+	for _, v := range items {
+		subdivs.Total++
+
+		switch v.Status {
+		case types.SubdivisionStatusActive:
+			subdivs.Active++
+		case types.SubdivisionStatusInactive:
+			subdivs.Inactive++
+		}
+	}
+
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
 	executeTemplate(le, w, "subdiv.htm", subdivs)

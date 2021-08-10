@@ -6,6 +6,8 @@ import (
 	"tacacs-webconsole/types"
 )
 
+const defaultAccountingRecordsPerPageLimit = 10
+
 func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
@@ -22,10 +24,21 @@ func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, _ := repository.GetAccounting(le, g.aerospikeClient)
+	items, err := repository.GetAccounting(le, g.aerospikeClient)
+	if err != nil {
+		le.WithError(err).Error("getting accounting failed")
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
 
-	acct := &types.AccountingRecs{
-		Items: items,
+	acct := &types.AccountingRecords{
+		Items:     items,
+		MoreItems: false,
+	}
+
+	// counting summary
+	for _, _ = range items {
+		acct.Total++
 	}
 
 	executeHeaderTemplate(le, w, authenticatedUsername)

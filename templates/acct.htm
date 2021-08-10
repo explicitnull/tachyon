@@ -18,7 +18,7 @@
 -->
 <h5 class="test-header">Accounting log</h5>
 <div class="test-body align-left">
-    <p class="align-left">БД обновляется раз в 5 минут. Записей в БД: {{.Total}}</p>
+    <p class="align-left">Database is updated every minute.</p>
 </div>
 
 </div>
@@ -29,22 +29,25 @@
             <fieldset class="no-legend">
                 <ol class="fields">
                     <li>
-                        <label class="field-label">Поиск по</label>
+                        <label class="field-label">Search by</label>
                         <select class="input" name="fld" required>
-                            <option value="usr">логину</option>
-                            <option value="cmd">команде</option>
+                            <option value="usr">account</option>
+                            <option value="cmd">command</option>
                         </select>
-                    </li>
-                    <li>
+                        <!-- </li>
+                    <li> -->
                         <label class="field-label"></label>
                         <input type="text" class="input" value="" name="val">
-                        <div class="field-help">Для поиска по маске используйте %</div>
+                        <div class="field-help">Use % for mask search</div>
                     </li>
                     <li>
-                        <label class="field-label">Ограничить по времени</label>
+                        <label class="field-label">From</label>
                         <input type="text" class="input" value="-infinity" name="from">
+                    </li>
+                    <li>
+                        <label class="field-label">To</label>
                         <input type="text" class="input" value="infinity" name="to">
-                        <div class="field-help">(в формате 2017-01-01 00:00:00)</div>
+                        <div class="field-help">(format: 2017-01-01 00:00:00)</div>
                     </li>
                 </ol>
             </fieldset>
@@ -61,17 +64,16 @@
             </fieldset>
 -->
             <div class="form-actions">
-                <button type="submit" class="button is-info">Найти</button>
-                <button type="reset" class="button">Сбросить</button>
+                <button type="submit" class="button round is-info">Search</button>
+                <button type="reset" class="button round">Discard</button>
             </div>
         </form>
-        <p>Будут показано только первые 50 тысяч строк. Для поиска по маске используйте знак '%', вводите время в
-            формате '2017-01-01 00:00:00'.</p>
+        <!-- <p>Будут показано только первые 50 тысяч строк. Для поиска по маске используйте знак '%', вводите время в формате '2017-01-01 00:00:00'.</p> -->
     </div>
 </div>
 <div class="test-demo">
     <div class="test-body">
-        <p class="align-left">Данные за последние 10 минут:</p>
+        <!-- <p class="align-left">Данные за последние 10 минут:</p> -->
         <table class="table align-left">
             <thead>
                 <th>ID</th>
@@ -96,5 +98,11 @@
             </tr>
             {{ end}}
         </table>
+        <p>
+            Total {{ .Total }}
+        </p>
+        {{ if .MoreItems }}
+        <p>{{ .ItemsPerPageLimit }} newest records shown, <a href="/acct/?limit=0">show all</a></p>
+        {{end}}
     </div>
 </div>

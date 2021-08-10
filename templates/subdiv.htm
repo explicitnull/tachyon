@@ -3,12 +3,12 @@
 	<p><a href="/newsubdiv/" class="button round is-info" role="button">Create new</a></p><br />
 	<table class="table is-striped">
 		<thead>
-			<th>МРФ/партнер</th>
-			<th>Подразделение</th>
-			<th>Описание</th>
-			<th>Статус</th>
-			<th>Дата/время создания (UTC)</th>
-			<th>Кем создано</th>
+			<th>Company</th>
+			<th>Subdivision</th>
+			<th>Description</th>
+			<th>Status</th>
+			<th>Created (UTC)</th>
+			<th>Created by</th>
 		</thead>
 		{{ range .Items}}
 		<tr>
@@ -21,4 +21,9 @@
 		</tr>
 		{{ end}}
 	</table>
+	<p>
+		Total {{ .Total }},
+		active {{ .Active }},
+		inactive {{ .Inactive }}
+	</p>
 </div>
