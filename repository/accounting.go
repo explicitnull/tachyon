@@ -2,10 +2,11 @@
 // insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('1jcnrdeslA', '1jcnrdeslA', 1610000000, '12.12.12.12', 'device34', 'admin', '45.67.89.90', 'reverse.example.com', 'login <cr>')
 // insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('aFCHxkuria', 'aFCHxkuria', 1600000000, '10.10.10.10', 'device01', 'jathan', '45.67.89.90', 'reverse.example.com', 'configure exclusive <cr>')
 // insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('abCHKRtpav', 'abCHKRtpav', 1610000000, '11.11.11.11', 'device22', 'admin', '45.67.89.90', 'reverse.example.com', 'set system login class view-only permissions [ view view-configuration ] <cr>')
+// insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('abCHKRtpaz', 'abCHKRtpaz', 1628772960, '13.13.13.13', 'rtr23', 'furai', '3.4.5.6', 'reverse.example.com', 'login')
+
 package repository
 
 import (
-	"strconv"
 	"tacacs-webconsole/types"
 	"time"
 
@@ -56,22 +57,17 @@ func GetAccountingWithEqualFilter(le *logrus.Entry, aclient *aerospike.Client, f
 	return res, nil
 }
 
-func GetAccountingWithTimeFilter(le *logrus.Entry, aclient *aerospike.Client, begin, end string) ([]types.AccountingRecord, error) {
+func GetAccountingWithTimeFilter(le *logrus.Entry, aclient *aerospike.Client, begin, end time.Time) ([]types.AccountingRecord, error) {
+	le.Debugf("repo time begin: %s, end: %s", begin, end)
+
 	res := make([]types.AccountingRecord, 0)
 
-	beginInt, err := strconv.ParseInt(begin, 10, 64)
-	if err != nil {
-		le.WithError(err).Error("convertion to int failed")
-		return nil, err
-	}
+	beginTS := begin.Unix()
+	endTS := end.Unix()
 
-	endInt, err := strconv.ParseInt(end, 10, 64)
-	if err != nil {
-		le.WithError(err).Error("convertion to int failed")
-		return nil, err
-	}
+	le.Debugf("repo stamp begin: %d, end: %d", beginTS, endTS)
 
-	records, err := getRecordsWithRangeFilter(aclient, accountingSet, "ts", beginInt, endInt)
+	records, err := getRecordsWithRangeFilter(aclient, accountingSet, "ts", beginTS, endTS)
 	if err != nil {
 		return res, err
 	}
@@ -105,7 +101,7 @@ func extractAccountingRecord(bins aerospike.BinMap) (types.AccountingRecord, err
 		return acct, err
 	}
 	tm := time.Unix(int64(ts), 0)
-	acct.Timestamp = tm.Format(timeFormat)
+	acct.Timestamp = tm.Format(types.TimeFormatSeconds)
 
 	acct.DeviceIP, err = extractString(bins, "device_ip")
 	if err != nil {

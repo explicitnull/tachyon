@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 	"tacacs-webconsole/applogic"
 	"tacacs-webconsole/repository"
 	"tacacs-webconsole/types"
+	"time"
 )
 
 const defaultAccountingRecordsPerPageLimit = 100
+const acctOffset = 10
 
 func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -25,7 +28,13 @@ func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, err := repository.GetAccounting(le, g.aerospikeClient)
+	now := time.Now()
+	begin := now.Add(-acctOffset * time.Minute)
+	end := now
+
+	le.Debugf("handler begin: %s, end: %s", begin, end)
+
+	items, err := repository.GetAccountingWithTimeFilter(le, g.aerospikeClient, begin, end)
 	if err != nil {
 		le.WithError(err).Error("getting accounting failed")
 		http.Error(w, "internal error", http.StatusInternalServerError)
@@ -79,16 +88,42 @@ func (g *Gateway) SearchAccounting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items := applogic.SearchAccounting(le, field, value, from, to, g.aerospikeClient)
+	var (
+		begin, end time.Time
+		err        error
+	)
+
+	if value == "" {
+		begin, err = time.Parse(types.TimeFormatSeconds, from)
+		if err != nil {
+			le.Error("wrong time format")
+			http.Error(w, "bad request: wrong time format", http.StatusBadRequest)
+			return
+		}
+
+		end, err = time.Parse(types.TimeFormatSeconds, to)
+		if err != nil {
+			le.Error("wrong time format")
+			http.Error(w, "bad request: wrong time format", http.StatusBadRequest)
+			return
+		}
+	}
+
+	items := applogic.SearchAccounting(le, field, value, begin, end, g.aerospikeClient)
 
 	acct := &types.AccountingRecords{
-		Items:       items,
-		MoreItems:   false,
-		SearchValue: value,
+		Items:     items,
+		MoreItems: false,
 	}
 
 	if len(items) == 0 {
 		acct.NotFound = true
+	}
+
+	if value != "" {
+		acct.SearchValue = value
+	} else if from != "" && to != "" {
+		acct.SearchValue = fmt.Sprintf("%s - %s", from, to)
 	}
 
 	// counting summary
