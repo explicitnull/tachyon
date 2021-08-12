@@ -15,6 +15,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+const cookieTTL = 1440
+
 func (g *Gateway) Login(w http.ResponseWriter, r *http.Request) {
 	le := getLoggerWithoutUsername(r)
 
@@ -100,7 +102,9 @@ func setCookie(w http.ResponseWriter, username string, sc *securecookie.SecureCo
 	value := map[string]string{
 		"name": username,
 	}
-	expiration := time.Now().Add(1 * time.Hour)
+
+	expiration := time.Now().Add(cookieTTL * time.Minute)
+
 	if encoded, err := sc.Encode("username", value); err == nil {
 		cookie := &http.Cookie{
 			Name:    "username",

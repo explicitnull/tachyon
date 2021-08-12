@@ -9,6 +9,8 @@ import (
 
 const namespace = "tacacs"
 
+const timeFormat = "2006-01-02 15:04:05"
+
 // type Metrics struct {
 // 	count int
 // 	total int
@@ -66,6 +68,7 @@ func getAllRecords(aclient *aerospike.Client, setName string) ([]*aerospike.Reco
 
 	records := make([]*aerospike.Record, 0)
 
+	// serial scan
 	for _, node := range nodeList {
 		recordset, err := aclient.ScanNode(policy, node, namespace, setName)
 		if err != nil {
@@ -100,6 +103,50 @@ func getAllRecords(aclient *aerospike.Client, setName string) ([]*aerospike.Reco
 		// 	log.Println("Node ", node, " set ", k, " count: ", v.count)
 		// 	v.count = 0
 		// }
+	}
+
+	return records, nil
+}
+
+func getRecordsWithEqualFilter(aclient *aerospike.Client, setName, binName, value string) ([]*aerospike.Record, error) {
+	stmt := aerospike.NewStatement("tacacs", setName)
+	stmt.SetFilter(aerospike.NewEqualFilter(binName, value))
+
+	rs, err := aclient.Query(nil, stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	records := make([]*aerospike.Record, 0)
+
+	for res := range rs.Results() {
+		if res.Err != nil {
+			return nil, res.Err
+		}
+
+		records = append(records, res.Record)
+	}
+
+	return records, nil
+}
+
+func getRecordsWithRangeFilter(aclient *aerospike.Client, setName, binName string, begin, end int64) ([]*aerospike.Record, error) {
+	stmt := aerospike.NewStatement("tacacs", setName)
+	stmt.SetFilter(aerospike.NewRangeFilter(binName, begin, end))
+
+	rs, err := aclient.Query(nil, stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	records := make([]*aerospike.Record, 0)
+
+	for res := range rs.Results() {
+		if res.Err != nil {
+			return nil, res.Err
+		}
+
+		records = append(records, res.Record)
 	}
 
 	return records, nil

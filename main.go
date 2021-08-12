@@ -62,36 +62,40 @@ func main() {
 	}
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", g.Index)
+	r.HandleFunc("/", g.Index).Methods("GET")
 	r.HandleFunc("/login/", g.Login).Methods("GET")
 	r.HandleFunc("/login/", g.LoginAction).Methods("POST")
-	r.HandleFunc("/logout/", g.Logout)
+	r.HandleFunc("/logout/", g.Logout).Methods("GET")
 
 	// tacplus configuration management handlers
+
 	r.HandleFunc("/myaccount/", g.ChangePassword).Methods("GET")
 	r.HandleFunc("/myaccount/", g.ChangePasswordAction).Methods("POST")
 
-	r.HandleFunc("/users/", g.ShowAccounts)
+	r.HandleFunc("/users/", g.ShowAccounts).Methods("GET")
 	r.HandleFunc("/newuser/", g.CreateUser).Methods("GET")
 	r.HandleFunc("/newuser/", g.CreateUserAction).Methods("POST")
 	r.HandleFunc("/edituser/{name}/", g.EditAccount).Methods("GET")
 	r.HandleFunc("/edituser/{name}/", g.EditAccountAction).Methods("POST")
 	// r.HandleFunc("/removeuser/{id:[0-9]+}/", remUser)
 
-	r.HandleFunc("/permissions/", g.ShowPermissions)
+	r.HandleFunc("/permissions/", g.ShowPermissions).Methods("GET")
 	r.HandleFunc("/newpermission/", g.CreatePermission).Methods("GET")
 	r.HandleFunc("/newpermission/", g.CreatePermissionAction).Methods("POST")
 	// r.HandleFunc("/editpermission/{id}/", editPermission).Methods("GET")
 	// r.HandleFunc("/editpermission/{id}/", editPermissionAction).Methods("POST")
 
-	r.HandleFunc("/subdiv/", g.ShowSubdivisions)
+	r.HandleFunc("/subdiv/", g.ShowSubdivisions).Methods("GET")
 
-	r.HandleFunc("/equipment/", g.ShowEquipment)
+	r.HandleFunc("/equipment/", g.ShowEquipment).Methods("GET")
 
 	// tacplus logs handlers
-	r.HandleFunc("/auth/", g.ShowAuthentications)
-	r.HandleFunc("/acct/", g.ShowAccounting)
-	// r.HandleFunc("/acct-search/", searchAcct)
+
+	r.HandleFunc("/auth/", g.ShowAuthentications).Methods("GET")
+	// r.HandleFunc("/acct-search/", g.SearchAuthentications)
+
+	r.HandleFunc("/acct/", g.ShowAccounting).Methods("GET")
+	r.HandleFunc("/acct-search/", g.SearchAccounting).Methods("POST")
 
 	// antibruteforce handler
 	r.HandleFunc("/lockout/", g.ShowLockouts)

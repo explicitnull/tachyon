@@ -1,6 +1,6 @@
 package types
 
-type AccountingRec struct {
+type AccountingRecord struct {
 	ID          string // new
 	Timestamp   string
 	DeviceIP    string
@@ -12,10 +12,13 @@ type AccountingRec struct {
 }
 
 type AccountingRecords struct {
-	Items []*AccountingRec
+	Items []AccountingRecord
 
 	Total int
 
+	NotFound          bool
 	MoreItems         bool
 	ItemsPerPageLimit int
+
+	SearchValue string
 }
