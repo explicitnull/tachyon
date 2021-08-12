@@ -10,7 +10,7 @@ import (
 )
 
 const defaultAccountingRecordsPerPageLimit = 100
-const acctOffset = 10
+const acctOffset = 60
 
 func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
