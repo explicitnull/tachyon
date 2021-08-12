@@ -46,9 +46,12 @@ func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 		MoreItems: false,
 	}
 
-	// counting summary
-	for _, _ = range items {
-		acct.Total++
+	if len(items) == 0 {
+		acct.NotFound = true
+	} else {
+		for range items {
+			acct.Total++
+		}
 	}
 
 	executeHeaderTemplate(le, w, authenticatedUsername)

@@ -17,9 +17,9 @@
 
 -->
 <h5 class="test-header">Accounting log</h5>
-<div class="test-body align-left">
+<!-- <div class="test-body align-left">
     <p class="align-left">Database is updated every minute.</p>
-</div>
+</div> -->
 
 </div>
 <div class="test-demo">
@@ -74,6 +74,9 @@
 <div class="test-demo">
     <div class="test-body">
         Last 10 minutes data:</br>
+        {{ if .NotFound }}
+        no records
+        {{ else }}
         <table class="table align-left">
             <thead>
                 <th>ID</th>
@@ -103,6 +106,7 @@
         </p>
         {{ if .MoreItems }}
         <p>{{ .ItemsPerPageLimit }} newest records shown, <a href="/acct/?limit=0">show all</a></p>
+        {{end}}
         {{end}}
     </div>
 </div>
