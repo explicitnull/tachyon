@@ -315,3 +315,41 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	// redirecting back
 	http.Redirect(w, r, r.URL.String(), http.StatusTemporaryRedirect)
 }
+
+func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	le := getLogger(r)
+
+	authenticatedUsername, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		return
+	}
+
+	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "admin" {
+		le.Warn("access forbidden")
+		http.Error(w, "access forbidden", http.StatusForbidden)
+		return
+	}
+
+	// parsing request
+	vars := mux.Vars(r)
+	name, ok := vars["name"]
+	if !ok {
+		le.Error(noIDinURL)
+	}
+
+	// getting account data from DB
+	acc, err := repository.GetAccountByName(le, g.aerospikeClient, name)
+	if err != nil {
+		le.WithError(err).Error("getting account failed")
+		http.Error(w, "access forbidden", http.StatusForbidden)
+	}
+
+	// writing response
+	executeHeaderTemplate(le, w, authenticatedUsername)
+
+	executeTemplate(le, w, "account_disabled.htm", acc)
+
+	executeFooterTemplate(le, w)
+}
