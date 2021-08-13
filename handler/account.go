@@ -212,13 +212,16 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 	name, ok := vars["name"]
 	if !ok {
 		le.Error(noIDinURL)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
 	}
 
 	// getting account data from DB
 	acc, err := repository.GetAccountByName(le, g.aerospikeClient, name)
 	if err != nil {
 		le.WithError(err).Error("getting account failed")
-		http.Error(w, "access forbidden", http.StatusForbidden)
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
 	}
 
 	// filling template data
@@ -251,10 +254,16 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 
 	// parsing request
 	vars := mux.Vars(r)
+	name, ok := vars["name"]
+	if !ok {
+		le.Error(noIDinURL)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
+	}
 
 	r.ParseForm()
 	fac := &types.Account{
-		Name:        vars["name"],
+		Name:        name,
 		Cleartext:   r.PostFormValue("pwd"),
 		Subdivision: r.PostFormValue("subdiv"),
 		Permission:  r.PostFormValue("perm"),
@@ -270,7 +279,8 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	dbac, err := repository.GetAccountByName(le, g.aerospikeClient, fac.Name)
 	if err != nil {
 		le.WithError(err).Error("getting account failed")
-		http.Error(w, "access forbidden", http.StatusForbidden)
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
 	}
 
 	// applying changes
@@ -281,6 +291,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		err = repository.SetPassword(g.aerospikeClient, fac.Name, hash)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
+			return
 		}
 	}
 
@@ -288,6 +299,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		err = repository.SetSubdivision(fac.Name, fac.Subdivision)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
+			return
 		}
 	}
 
@@ -295,6 +307,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		err = repository.SetSubdivision(fac.Name, fac.Subdivision)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
+			return
 		}
 	}
 
@@ -302,6 +315,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		err = repository.SetMail(fac.Name, fac.Mail)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
+			return
 		}
 	}
 
@@ -337,6 +351,8 @@ func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
 	name, ok := vars["name"]
 	if !ok {
 		le.Error(noIDinURL)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
 	}
 
 	// getting account data from DB

@@ -15,6 +15,7 @@ func (g *Gateway) Index(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			le.WithError(err).Error("template parsing failed")
 			http.Error(w, "template parsing failed", http.StatusInternalServerError)
+			return
 		}
 		t.Execute(w, nil)
 		return

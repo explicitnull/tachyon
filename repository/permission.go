@@ -76,33 +76,36 @@ func CreatePermission(le *logrus.Entry, client *aerospike.Client, p *types.Permi
 func GetPermissionByName(le *logrus.Entry, client *aerospike.Client, name string) (*types.Permission, error) {
 	var key *aerospike.Key
 
-	skey := name
-	key, err := aerospike.NewKey(namespace, permissionsSet, skey)
-	panicOnError(err)
+	key, err := aerospike.NewKey(namespace, permissionsSet, name)
+	if err != nil {
+		return nil, err
+	}
 
 	policy := aerospike.NewPolicy()
-	policy.SleepBetweenRetries = 50 * time.Millisecond
-	policy.MaxRetries = 10
-	policy.SleepMultiplier = 2.0
 
 	rec, err := client.Get(policy, key)
 	if err != nil {
-		le.WithError(err).Error("aerospike query failed")
 		return nil, err
 	}
 
 	if rec == nil {
-		printError("record not found: namespace=%s set=%s key=%v", key.Namespace(), key.SetName(), key.Value())
 		return nil, errors.New("record not found")
 	}
 
 	perm, err := extractPermission(rec.Bins)
 	if err != nil {
-		le.WithError(err).Error("extracting bins failed")
 		return nil, err
 	}
 
 	return perm, nil
+}
+
+func SetPermissionStatus(le *logrus.Entry, name string, status string) error {
+	return nil
+}
+
+func SetPermissionDescription(le *logrus.Entry, name string, description string) error {
+	return nil
 }
 
 func extractPermission(bins aerospike.BinMap) (*types.Permission, error) {

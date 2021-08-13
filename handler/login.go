@@ -53,7 +53,6 @@ func (g *Gateway) LoginAction(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "setting cookie failed")
 		le.WithError(err).Error("setting cookie failed")
 		http.Error(w, "setting cookie failed", http.StatusFailedDependency)
-
 		return
 	}
 

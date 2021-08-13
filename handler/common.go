@@ -15,8 +15,11 @@ const timeShort = "2006-01-02 15:04"
 
 // error strings for responses and logs
 const (
-	noIDinURL     = "no id in URL"
-	databaseError = "database error"
+	noIDinURL       = "no id in URL"
+	badRequest      = "bad request"
+	databaseError   = "database error"
+	serverError     = "server error"
+	accessForbidden = "access forbidden"
 )
 
 const emptySelect = "--"

@@ -1,5 +1,4 @@
 <h2 class="test-header">Permission "{{.Name}}"</h2>
-
 <div class="test-body full">
     <form action="/editpermission/{{.Name}}/" class="form--horizontal" method="post">
         <fieldset class="no-legend">
@@ -17,24 +16,10 @@
                         <div class="field-help"></div>
                     </div>
                 </li>
-                <!--
-                            <li>
-                                <label class="field-label col span-4"></label>
-                                <div class="field-col col span-8">
-                                <label class="input-checkbox"><input type="checkbox" name="active" {{.Active}} disabled> Доступно для выбора</label>
-                                </div>
-                            </li>
-			    -->
             </ol>
         </fieldset>
         <div class="form-actions">
             <button type="submit" class="button is-info">Save</button>
         </div>
-        <!--
-		    <br><br><div class="divider"></div><br>
-                    <div class="form-actions">
-		        <a href="/deletepermission/{{.Id}}/" class="button is-warning" role="button" disabled>Удалить</a>
-                    </div>
-		    -->
     </form>
 </div>

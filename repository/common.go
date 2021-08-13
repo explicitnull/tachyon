@@ -38,7 +38,7 @@ func extractString(bins aerospike.BinMap, bin string) (string, error) {
 
 	value, ok := valueI.(string)
 	if !ok {
-		return "", errors.New("BinMap value is not string for key " + bin)
+		return "", errors.New("value of BinMap is not string for key " + bin)
 	}
 
 	return value, nil

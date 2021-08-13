@@ -71,7 +71,7 @@ func (g *Gateway) CreatePermission(w http.ResponseWriter, r *http.Request) {
 
 	executeHeaderTemplate(le, w, username)
 
-	executeTemplate(le, w, "newpermission.htm", nil)
+	executeTemplate(le, w, "permission_new.htm", nil)
 
 	executeFooterTemplate(le, w)
 }
@@ -134,13 +134,16 @@ func (g *Gateway) EditPermission(w http.ResponseWriter, r *http.Request) {
 	name, ok := vars["name"]
 	if !ok {
 		le.Error(noIDinURL)
+		http.Error(w, "bad request", http.StatusBadRequest)
+		return
 	}
 
 	// getting data from DB
 	perm, err := repository.GetPermissionByName(le, g.aerospikeClient, name)
 	if err != nil {
 		le.WithError(err).Error("getting permission failed")
-		http.Error(w, "access forbidden", http.StatusForbidden)
+		http.Error(w, "server error", http.StatusInternalServerError)
+		return
 	}
 
 	// writing response
@@ -163,44 +166,53 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 
 	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "admin" {
 		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
+		http.Error(w, accessForbidden, http.StatusForbidden)
 		return
 	}
 
 	// parsing request
 	vars := mux.Vars(r)
+	name, ok := vars["name"]
+	if !ok {
+		le.Error(noIDinURL)
+		http.Error(w, badRequest, http.StatusBadRequest)
+		return
+	}
 
 	r.ParseForm()
-	fperm := &types.Account{
-		Name:        vars["name"],
-		Cleartext:   r.PostFormValue("descr"),
-		Subdivision: r.PostFormValue("status"),
+	fperm := &types.Permission{
+		Name:        name,
+		Description: r.PostFormValue("descr"),
+		Status:      r.PostFormValue("status"),
 	}
 
-	_, act := r.Form["active"]
-	if act {
-		fperm.Status = "active"
-	}
+	// _, act := r.Form["active"]
+	// if act {
+	// 	fperm.Status = "active"
+	// }
 
 	// getting account data from DB
-	dbac, err := repository.GetAccountByName(le, g.aerospikeClient, fperm.Name)
+	dbperm, err := repository.GetPermissionByName(le, g.aerospikeClient, fperm.Name)
 	if err != nil {
-		le.WithError(err).Error("getting account failed")
-		http.Error(w, "access forbidden", http.StatusForbidden)
+		le.WithError(err).Error("getting permission failed")
+		http.Error(w, databaseError, http.StatusInternalServerError)
+		return
 	}
 
 	// applying changes
-	if fperm.Mail != "" && fperm.Mail != dbac.Mail {
-		err = repository.SetMail(fperm.Name, fperm.Mail)
+	if fperm.Description != "" && fperm.Description != dbperm.Description {
+		err = repository.SetPermissionDescription(le, name, fperm.Description)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
+			return
 		}
 	}
 
-	if fperm.Status != dbac.Status {
-		err = repository.SetAccountStatus(le, fperm.Name, fperm.Status)
+	if fperm.Status != dbperm.Status {
+		err = repository.SetPermissionStatus(le, name, fperm.Status)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
+			return
 		}
 	}
 

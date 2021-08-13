@@ -109,6 +109,7 @@ func main() {
 
 	// TODO: move serving assets to standalone proxy like nginx
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
+	serveSingle("/favicon.ico", "./favicon.ico")
 	http.Handle("/", r)
 
 	log.Warn("listening http on port 8000")
@@ -120,4 +121,10 @@ func main() {
 
 func cookieInit(hashKey, blockKey []byte) *securecookie.SecureCookie {
 	return securecookie.New(hashKey, blockKey)
+}
+
+func serveSingle(pattern string, filename string) {
+	http.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, filename)
+	})
 }
