@@ -1,9 +1,5 @@
 package types
 
-type Authentications struct {
-	Items []Authentication
-	Total int
-}
 type Authentication struct {
 	ID          string // new
 	Timestamp   string
@@ -13,4 +9,13 @@ type Authentication struct {
 	EventType   string
 	UserIP      string
 	UserFQDN    string // new
+}
+
+type Authentications struct {
+	Items             []Authentication
+	Total             int
+	NotFound          bool
+	MoreItems         bool
+	ItemsPerPageLimit int
+	SearchValue       string
 }

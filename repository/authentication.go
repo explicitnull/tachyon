@@ -1,8 +1,9 @@
-// insert into tacacs.authentications(PK, id, account, device_ip, device_name, event_type, user_ip, user_fqdn) values ('yVZfYfB76p7wTHCHKgRb', 'yVZfYfB76p7wTHCHKgRb', 't1000', '10.10.10.10', 'device04', 'user_not_found', '45.67.89.90', 'reverse.example.com')
+// insert into tacacs.authentications(PK, id, ts, account, device_ip, device_name, event_type, user_ip, user_fqdn) values ('76p7wTHCHK', '76p7wTHCHK', 1628772995, 'root', '10.10.10.10', 'device04', 'user_not_found', '45.67.89.90', 'reverse.example.com')
 package repository
 
 import (
 	"tacacs-webconsole/types"
+	"time"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"
@@ -32,6 +33,33 @@ func GetAuthentications(le *logrus.Entry, aclient *aerospike.Client) ([]types.Au
 	return result, nil
 }
 
+func GetAuthenticationWithTimeFilter(le *logrus.Entry, aclient *aerospike.Client, begin, end time.Time) ([]types.Authentication, error) {
+	le.Debugf("repo time begin: %s, end: %s", begin, end)
+
+	res := make([]types.Authentication, 0)
+
+	beginTS := begin.Unix()
+	endTS := end.Unix()
+
+	le.Debugf("repo stamp begin: %d, end: %d", beginTS, endTS)
+
+	records, err := getRecordsWithRangeFilter(aclient, authenticationsSet, "ts", beginTS, endTS)
+	if err != nil {
+		return res, err
+	}
+
+	for _, v := range records {
+		aut, err := extractAuthentication(v.Bins)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, aut)
+	}
+
+	return res, nil
+}
+
 func extractAuthentication(bins aerospike.BinMap) (types.Authentication, error) {
 	auth := types.Authentication{}
 
@@ -42,10 +70,12 @@ func extractAuthentication(bins aerospike.BinMap) (types.Authentication, error) 
 		return types.Authentication{}, err
 	}
 
-	auth.Timestamp, err = extractString(bins, "ts")
+	ts, err := extractInt(bins, "ts")
 	if err != nil {
 		return types.Authentication{}, err
 	}
+	tm := time.Unix(int64(ts), 0)
+	auth.Timestamp = tm.Format(types.TimeFormatSeconds)
 
 	auth.AccountName, err = extractString(bins, "account")
 	if err != nil {

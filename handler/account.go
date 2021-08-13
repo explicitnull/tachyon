@@ -228,7 +228,7 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 	// writing response
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	executeTemplate(le, w, "user.htm", acc)
+	executeTemplate(le, w, "account.htm", acc)
 
 	executeFooterTemplate(le, w)
 }

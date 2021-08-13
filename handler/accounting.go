@@ -10,7 +10,6 @@ import (
 )
 
 const defaultAccountingRecordsPerPageLimit = 100
-const acctOffset = 60
 
 func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
@@ -28,15 +27,8 @@ func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	now := time.Now()
-	begin := now.Add(-acctOffset * time.Minute)
-	end := now
-
-	le.Debugf("handler begin: %s, end: %s", begin, end)
-
-	items, err := repository.GetAccountingWithTimeFilter(le, g.aerospikeClient, begin, end)
+	items, err := applogic.ShowAccounting(le, g.aerospikeClient)
 	if err != nil {
-		le.WithError(err).Error("getting accounting failed")
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
@@ -59,6 +51,8 @@ func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "acct.htm", acct)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) SearchAccounting(w http.ResponseWriter, r *http.Request) {

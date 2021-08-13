@@ -24,7 +24,7 @@ var (
 func init() {
 	// log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(os.Stdout)
-	log.SetLevel(log.DebugLevel)
+
 }
 
 func main() {
@@ -37,6 +37,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("loading options failed: %v", err)
 	}
+
+	log.SetLevel(log.InfoLevel)
 
 	// db := database.Open(appOptions.DbHost, appOptions.DbName, appOptions.DbName, appOptions.DbPassword)
 
@@ -91,8 +93,8 @@ func main() {
 
 	// tacplus logs handlers
 
-	r.HandleFunc("/auth/", g.ShowAuthentications).Methods("GET")
-	// r.HandleFunc("/acct-search/", g.SearchAuthentications)
+	r.HandleFunc("/auth/", g.ShowAuthentication).Methods("GET")
+	// r.HandleFunc("/auth_search/", g.SearchAuthentications)
 
 	r.HandleFunc("/acct/", g.ShowAccounting).Methods("GET")
 	r.HandleFunc("/acct-search/", g.SearchAccounting).Methods("POST")

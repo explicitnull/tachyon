@@ -1,4 +1,4 @@
-<h3 class="test-header">Authentication log</h3>
+<!-- <h3 class="test-header">Authentication log</h3>
 <div class="test-body">
 	<table class="table">
 		<p>БД обновляется раз в 5 минут. Записей в БД: {{.Total}}</p>
@@ -24,4 +24,96 @@
 		</tr>
 		{{ end}}
 	</table>
+</div> -->
+<h5 class="test-header">Authentication log</h5>
+<!-- <div class="test-body align-left">
+    <p class="align-left">Database is updated every minute.</p>
+</div> -->
+
+</div>
+<div class="test-demo">
+	<div class="test-body">
+		<form action="/auth_search/" class="form--inline" method="post">
+			<fieldset class="no-legend">
+				<ol class="fields">
+					<li>
+						<label class="field-label">Field</label>
+						<select class="input" name="fld" required>
+							<option value="account">account</option>
+							<option value="device_ip">device IP</option>
+						</select>
+						<!-- </li>
+                    <li> -->
+						<label class="field-label">&nbsp; equal to</label>
+						<input type="text" class="input" value="" name="val">
+						<div class="field-help">Use % for mask search</div>
+					</li>
+					<li>
+						<label class="field-label">OR time from</label>
+						<input type="text" class="input" value="" name="from">
+					</li>
+					<li>
+						<label class="field-label">to</label>
+						<input type="text" class="input" value="" name="to">
+						<div class="field-help">(format: 2017-01-01 00:00:00)</div>
+					</li>
+				</ol>
+			</fieldset>
+			<!--
+            <fieldset>
+                <legend>Fieldset with legend</legend>
+
+                <div class="field">
+                    <label class="input-checkbox"><input type="checkbox" name="checkbox"> Checkbox</label>
+                </div>
+                <div class="field">
+                    <label class="input-radio"><input type="radio" name="radio"> Radio</label>
+                </div>
+            </fieldset>
+-->
+			<div class="form-actions">
+				<button type="submit" class="button round is-info">Search</button>
+				<button type="reset" class="button round">Discard</button>
+			</div>
+		</form>
+		<!-- <p>Будут показано только первые 50 тысяч строк. Для поиска по маске используйте знак '%', вводите время в формате '2017-01-01 00:00:00'.</p> -->
+	</div>
+</div>
+<div class="test-demo">
+	<div class="test-body">
+		Last 60 minutes data:
+		{{ if .NotFound }}
+		no records
+		{{ else }}
+		</br>
+		<table class="table align-left">
+			<thead>
+				<th>ID</th>
+				<th>Timestamp</th>
+				<th>Account name</th>
+				<th>Device IP</th>
+				<th>Device name</th>
+				<th>Event type</th>
+				<th>User IP</th>
+			</thead>
+			{{ range .Items}}
+			<tr>
+				<td>{{ .ID }}</td>
+				<td>{{ .Timestamp }}</td>
+				<td>{{ .AccountName }}</td>
+				<td>{{ .DeviceIP }}</td>
+				<td>{{ .DeviceName }}</td>
+				<td>{{ .EventType }}</td>
+				<td>{{ .UserIP }}</td>
+			</tr>
+			{{ end}}
+		</table>
+		<p>
+			Total {{ .Total }}
+		</p>
+		{{ if .MoreItems }}
+		<p>{{ .ItemsPerPageLimit }} newest records shown, <a href="/acct/?limit=0">show all</a></p>
+		{{end}}
+		{{end}}
+	</div>
 </div>

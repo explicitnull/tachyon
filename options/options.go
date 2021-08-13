@@ -20,6 +20,7 @@ type Options struct {
 	Maintenance        string
 	EqpTimeBefore      string
 	AerospikeNamespace string // new
+	LogLevel           string // new
 }
 
 func Load(o *Options) error {

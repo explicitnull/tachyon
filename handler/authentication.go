@@ -2,11 +2,11 @@ package handler
 
 import (
 	"net/http"
-	"tacacs-webconsole/repository"
+	"tacacs-webconsole/applogic"
 	"tacacs-webconsole/types"
 )
 
-func (g *Gateway) ShowAuthentications(w http.ResponseWriter, r *http.Request) {
+func (g *Gateway) ShowAuthentication(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
@@ -16,7 +16,7 @@ func (g *Gateway) ShowAuthentications(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, err := repository.GetAuthentications(le, g.aerospikeClient)
+	items, err := applogic.ShowAuthentication(le, g.aerospikeClient)
 	if err != nil {
 		le.WithError(err).Error("getting authentications failed")
 		http.Error(w, "internal error", http.StatusInternalServerError)
@@ -27,10 +27,20 @@ func (g *Gateway) ShowAuthentications(w http.ResponseWriter, r *http.Request) {
 		Items: items,
 	}
 
+	if len(items) == 0 {
+		auts.NotFound = true
+	} else {
+		for range items {
+			auts.Total++
+		}
+	}
+
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
 	le.Debugf("%#v", auts)
 	executeTemplate(le, w, "auth.htm", auts)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }

@@ -1,4 +1,27 @@
-<h5 class="test-header">Accounting log</h5>
+<!-- <h3 class="test-header">Accounting log search results</h3>
+<div class="test-body">
+    <form action="/acct-search" method="post">
+
+        Новый поиск: <select name="fld" required maxlength="15">
+            <option>usr</option>
+            <option>cmd</option>
+        </select>
+        <input type="text" name="val" maxlength="40" value=""><br />
+        Интервал времени (в формате 2016-11-13T08:49:04):
+        <table border="0">&nbsp;<input type="text" name="from" maxlength="25" value="-infinity">&nbsp;-&nbsp;<input
+                type="text" name="to" maxlength="25" value="infinity">&nbsp;<input type="submit" value="Поиск">
+    </form>
+    <p>Результаты поиска:</p>
+    <table class="table small">
+        <thead>
+            <th>Время UTC</th>
+            <th>Пользователь</th>
+            <th>IP устройства</th>
+            <th>Hostname</th>
+            <th>Команда</th>
+            <th>IP пользователя</th>
+        </thead> -->
+<h5 class="test-header">Accounting log search results</h5>
 <!-- <div class="test-body align-left">
     <p class="align-left">Database is updated every minute.</p>
 </div> -->
@@ -17,7 +40,7 @@
                             <option value="device_ip">device IP</option>
                         </select>
                         <!-- </li>
-                    <li> -->
+                            <li> -->
                         <label class="field-label">&nbsp; equal to</label>
                         <input type="text" class="input" value="" name="val">
                         <div class="field-help">Use % for mask search</div>
@@ -34,17 +57,17 @@
                 </ol>
             </fieldset>
             <!--
-            <fieldset>
-                <legend>Fieldset with legend</legend>
-
-                <div class="field">
-                    <label class="input-checkbox"><input type="checkbox" name="checkbox"> Checkbox</label>
-                </div>
-                <div class="field">
-                    <label class="input-radio"><input type="radio" name="radio"> Radio</label>
-                </div>
-            </fieldset>
--->
+                    <fieldset>
+                        <legend>Fieldset with legend</legend>
+        
+                        <div class="field">
+                            <label class="input-checkbox"><input type="checkbox" name="checkbox"> Checkbox</label>
+                        </div>
+                        <div class="field">
+                            <label class="input-radio"><input type="radio" name="radio"> Radio</label>
+                        </div>
+                    </fieldset>
+        -->
             <div class="form-actions">
                 <button type="submit" class="button round is-info">Search</button>
                 <button type="reset" class="button round">Discard</button>
@@ -55,7 +78,7 @@
 </div>
 <div class="test-demo">
     <div class="test-body">
-        Last 60 minutes data:
+        Results matching &quot;{{ .SearchValue }}&quot;:
         {{ if .NotFound }}
         no records
         {{ else }}
