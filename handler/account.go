@@ -340,10 +340,14 @@ func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// getting account data from DB
-	acc, err := repository.GetAccountByName(le, g.aerospikeClient, name)
+	err := repository.SetAccountStatus(le, name, types.AccountStatusSuspended)
 	if err != nil {
-		le.WithError(err).Error("getting account failed")
-		http.Error(w, "access forbidden", http.StatusForbidden)
+		le.WithError(err).Error("disabling account failed")
+		http.Error(w, "disabling account failed", http.StatusInternalServerError)
+	}
+
+	acc := types.Account{
+		Name: name,
 	}
 
 	// writing response
