@@ -342,8 +342,9 @@ func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
 	// getting account data from DB
 	err := repository.SetAccountStatus(le, name, types.AccountStatusSuspended)
 	if err != nil {
-		le.WithError(err).Error("disabling account failed")
-		http.Error(w, "disabling account failed", http.StatusInternalServerError)
+		le.WithError(err).Error("setting account status failure")
+		http.Error(w, "setting account status failure", http.StatusInternalServerError)
+		return
 	}
 
 	acc := types.Account{
