@@ -84,8 +84,8 @@ func main() {
 	r.HandleFunc("/permissions/", g.ShowPermissions).Methods("GET")
 	r.HandleFunc("/newpermission/", g.CreatePermission).Methods("GET")
 	r.HandleFunc("/newpermission/", g.CreatePermissionAction).Methods("POST")
-	// r.HandleFunc("/editpermission/{id}/", editPermission).Methods("GET")
-	// r.HandleFunc("/editpermission/{id}/", editPermissionAction).Methods("POST")
+	r.HandleFunc("/editpermission/{name}/", g.EditPermission).Methods("GET")
+	r.HandleFunc("/editpermission/{name}/", g.EditPermissionAction).Methods("POST")
 
 	r.HandleFunc("/subdiv/", g.ShowSubdivisions).Methods("GET")
 
