@@ -30,17 +30,10 @@ func init() {
 
 func main() {
 	// TODO: add govvv
-	log.Warnf("starting %s...", appName)
-
-	appOptions := new(options.Options)
-	appOptions.MinPassLen = 9
-
-	err := options.Load(appOptions)
-	if err != nil {
-		log.Fatalf("loading options failed: %v", err)
-	}
-
+	log.Warnf("starting %s", appName)
 	log.SetLevel(log.InfoLevel)
+
+	log.Warnf("establishing connection to database")
 
 	// TODO: pg support
 	// db := database.Open(appOptions.DbHost, appOptions.DbName, appOptions.DbName, appOptions.DbPassword)
@@ -48,6 +41,16 @@ func main() {
 	aerospikeClient, err := aerospike.NewClient(host, port)
 	if err != nil {
 		log.Fatalf("aerospike init failed: %v", err)
+	}
+
+	log.Warnf("receiving settings")
+
+	appOptions := new(options.Options)
+	appOptions.MinPassLen = 9
+
+	err = options.Load(appOptions)
+	if err != nil {
+		log.Fatalf("loading options failed: %v", err)
 	}
 
 	// TODO: move to config
@@ -118,7 +121,8 @@ func main() {
 	http.Handle("/", r)
 
 	// server
-	log.Warn("listening http on port 8000")
+	// TODO: move port to conf
+	log.Warn("starting http server on port 8000")
 	err = http.ListenAndServe(":8000", nil)
 	if err != nil {
 		log.Fatalf("starting HTTP server failed: %v", err)
