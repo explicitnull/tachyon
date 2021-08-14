@@ -25,6 +25,8 @@ func (g *Gateway) Login(w http.ResponseWriter, r *http.Request) {
 		le.WithError(err).Error("template parsing failed")
 	}
 	t.Execute(w, nil)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) LoginAction(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +66,7 @@ func (g *Gateway) LoginAction(w http.ResponseWriter, r *http.Request) {
 	}
 	mid.Execute(w, nil)
 
+	le.Info("handled ok")
 }
 
 func loginAction(le *logrus.Entry, username, formPassword string, aClient *aerospike.Client, r *http.Request) bool {

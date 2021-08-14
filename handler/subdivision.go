@@ -45,6 +45,8 @@ func (g *Gateway) ShowSubdivisions(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "subdiv.htm", subdivs)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) CreateSubdivision(w http.ResponseWriter, r *http.Request) {
@@ -68,4 +70,6 @@ func (g *Gateway) CreateSubdivision(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "subdiv_new.htm", nil)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }

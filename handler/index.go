@@ -32,4 +32,6 @@ func (g *Gateway) Index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<p>Welcome!</p>")
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }

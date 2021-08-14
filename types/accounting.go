@@ -12,8 +12,10 @@ type AccountingRecord struct {
 }
 
 type AccountingRecords struct {
-	Items             []AccountingRecord
-	Total             int
+	Items []AccountingRecord
+
+	Total int
+
 	NotFound          bool
 	MoreItems         bool
 	ItemsPerPageLimit int

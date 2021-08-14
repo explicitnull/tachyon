@@ -12,8 +12,10 @@ type Authentication struct {
 }
 
 type Authentications struct {
-	Items             []Authentication
-	Total             int
+	Items []Authentication
+
+	Total int
+
 	NotFound          bool
 	MoreItems         bool
 	ItemsPerPageLimit int

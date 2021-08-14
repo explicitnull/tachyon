@@ -19,6 +19,8 @@ func (g *Gateway) Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	t.Execute(w, nil)
+
+	le.Info("handled ok")
 }
 
 func deleteCookie(w http.ResponseWriter) {

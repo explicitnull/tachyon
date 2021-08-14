@@ -12,4 +12,6 @@ type Lockout struct {
 
 type Lockouts struct {
 	Items []*Lockout
+
+	Total int
 }

@@ -28,9 +28,16 @@ func (g *Gateway) ShowLockouts(w http.ResponseWriter, r *http.Request) {
 		Items: items,
 	}
 
+	// counting summary
+	for range items {
+		lockouts.Total++
+	}
+
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
 	executeTemplate(le, w, "lockout.htm", lockouts)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }

@@ -125,4 +125,6 @@ func (g *Gateway) SearchAuthentication(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "auth_search.htm", auts)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }

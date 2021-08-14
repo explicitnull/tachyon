@@ -17,9 +17,8 @@ const appName = "tacacs-webconsole"
 
 // TODO: move to env
 var (
-	host      = "13.48.3.15"
-	port      = 3000
-	namespace = "tacacs"
+	host = "13.48.3.15"
+	port = 3000
 )
 
 func init() {

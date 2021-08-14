@@ -71,6 +71,8 @@ func (g *Gateway) ShowAccounts(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "accounts.htm", accounts)
 
 	executeFooterTemplate(le, w)
+
+	le.WithField("origin", "ShowAccounts").Info("handled ok")
 }
 
 type FormOptions struct {
@@ -108,6 +110,8 @@ func (g *Gateway) CreateUser(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "account_new.htm", form)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
@@ -129,9 +133,10 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	acc := types.Account{
 		Name:        r.PostFormValue("username"),
-		Mail:        r.PostFormValue("mail"),
 		Subdivision: r.PostFormValue("subdiv"),
 		Permission:  r.PostFormValue("perm"),
+		Mail:        r.PostFormValue("mail"),
+		Status:      r.PostFormValue("status"),
 	}
 
 	if acc.Mail == "" {
@@ -155,6 +160,8 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "usercreated.htm", uc)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func genPass() string {
@@ -234,6 +241,8 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "account.htm", acc)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
@@ -268,11 +277,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		Subdivision: r.PostFormValue("subdiv"),
 		Permission:  r.PostFormValue("perm"),
 		Mail:        r.PostFormValue("m"),
-	}
-
-	_, act := r.Form["active"]
-	if act {
-		fac.Status = "active"
+		Status:      r.PostFormValue("status"),
 	}
 
 	// getting account data from DB
@@ -287,7 +292,6 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	if fac.Cleartext != "" {
 		hash := makeHash(le, fac.Cleartext)
 		le.Debug(hash)
-
 		err = repository.SetPassword(g.aerospikeClient, fac.Name, hash)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
@@ -330,6 +334,8 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	// redirecting back
 	// http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
 	fmt.Fprintf(w, "ok")
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
@@ -375,4 +381,6 @@ func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "account_disabled.htm", acc)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }

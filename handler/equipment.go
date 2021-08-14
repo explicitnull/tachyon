@@ -33,4 +33,6 @@ func (g *Gateway) ShowEquipment(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "eqp.htm", subdivs)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }

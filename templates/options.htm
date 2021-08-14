@@ -1,16 +1,39 @@
-<h3 class="test-header">Options</h3>
+<h3 class="test-header">Webconsole settings</h3>
 </div>
 <div class="test-demo">
+
     <div class="test-body">
+        Options:<br>
         <table class="table is-striped">
             <thead>
                 <th>Name</th>
                 <th>Value</th>
             </thead>
-            {{ range .Items}}
+            {{ range .OptionItems}}
             <tr>
-                <td>{{ .Name }}</a></td>
+                <td>{{ .Name }}</td>
                 <td>{{ .Value }}</td>
+            </tr>
+            {{ end}}
+        </table>
+    </div>
+</div>
+<div class="test-demo">
+    <div class="test-body">
+        API tokens:<br>
+        <table class="table is-striped">
+            <thead>
+                <th>ID</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Token</th>
+            </thead>
+            {{ range .TokenItems}}
+            <tr>
+                <td>{{ .ID }}</td>
+                <td>{{ .Type }}</td>
+                <td>{{ .Status }}</td>
+                <td>{{ .Token }}</td>
             </tr>
             {{ end}}
         </table>

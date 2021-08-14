@@ -6,5 +6,6 @@ type Option struct {
 }
 
 type Options struct {
-	Items []*Option
+	OptionItems []*Option
+	TokenItems  []*Token
 }

@@ -20,6 +20,7 @@
             <th>Created (UTC)</th>
             <th>Password changed</th>
             <th>Created by</th>
+            <th>UI role</th>
         </thead>
         {{ range .Items}}
         <tr>
@@ -31,16 +32,17 @@
             <td>{{ .CreatedTimestamp }}</td>
             <td>{{ .PasswordChangedTimestamp }}</td>
             <td>{{ .CreatedBy }}</td>
+            <td>{{ .UIRole }}</td>
         </tr>
         {{ end}}
     </table>
     <p>
-        Total {{ .Total }},
-        active {{ .Active }},
-        tmp_pass_not_chd {{ .PasswordNotChanged }},
-        suspended {{ .Suspended }}
+        total: {{ .Total }}<br>
+        active: {{ .Active }}<br>
+        tmp_pass_not_chd: {{ .PasswordNotChanged }}<br>
+        suspended: {{ .Suspended }}<br>
     </p>
-    {{ if .MoreItems }}
+    <!-- {{ if .MoreItems }}
     <p>{{ .ItemsPerPageLimit }} newest records shown, <a href="/users/?limit=0">show all</a></p>
-    {{end}}
+    {{end}} -->
 </div>

@@ -22,15 +22,23 @@ func (g *Gateway) ShowOptions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, err := repository.GetOptions(le, g.aerospikeClient)
+	o, err := repository.GetOptions(le, g.aerospikeClient)
 	if err != nil {
 		le.WithError(err).Error("getting options failed")
 		http.Error(w, "internal error", http.StatusInternalServerError)
 		return
 	}
 
+	t, err := repository.GetTokens(le, g.aerospikeClient)
+	if err != nil {
+		le.WithError(err).Error("getting tokens failed")
+		http.Error(w, "internal error", http.StatusInternalServerError)
+		return
+	}
+
 	opts := &types.Options{
-		Items: items,
+		OptionItems: o,
+		TokenItems:  t,
 	}
 
 	executeHeaderTemplate(le, w, authenticatedUsername)
@@ -38,6 +46,8 @@ func (g *Gateway) ShowOptions(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "options.htm", opts)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 // func (g *Gateway) EditOptionsAction(w http.ResponseWriter, r *http.Request) {

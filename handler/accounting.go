@@ -133,4 +133,6 @@ func (g *Gateway) SearchAccounting(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "acct_search.htm", acct)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }

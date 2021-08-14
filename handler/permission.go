@@ -51,6 +51,8 @@ func (g *Gateway) ShowPermissions(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "permissions.htm", perms)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) CreatePermission(w http.ResponseWriter, r *http.Request) {
@@ -74,6 +76,8 @@ func (g *Gateway) CreatePermission(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "permission_new.htm", nil)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) CreatePermissionAction(w http.ResponseWriter, r *http.Request) {
@@ -111,6 +115,8 @@ func (g *Gateway) CreatePermissionAction(w http.ResponseWriter, r *http.Request)
 	executeTemplate(le, w, "permissioncreated.htm", pc)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) EditPermission(w http.ResponseWriter, r *http.Request) {
@@ -152,6 +158,8 @@ func (g *Gateway) EditPermission(w http.ResponseWriter, r *http.Request) {
 	executeTemplate(le, w, "permission.htm", perm)
 
 	executeFooterTemplate(le, w)
+
+	le.Info("handled ok")
 }
 
 func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
@@ -218,4 +226,6 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 
 	// redirecting back
 	http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
+
+	le.Info("handled ok")
 }

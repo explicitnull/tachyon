@@ -36,7 +36,7 @@ func (g *Gateway) ChangePassword(w http.ResponseWriter, r *http.Request) {
 
 	executeFooterTemplate(le, w)
 
-	le.WithField("origin", "ChangePassword").Infof("request processed")
+	le.WithField("origin", "ChangePassword").Info("handled ok")
 }
 
 func (g *Gateway) ChangePasswordAction(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +68,8 @@ func (g *Gateway) ChangePasswordAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprintf(w, "<p>Пароль изменен.</p>")
+
+	le.WithField("origin", "ChangePasswordAction").Info("handled ok")
 }
 
 func changePasswordAction(le *logrus.Entry, aclient *aerospike.Client, authenticatedUsername, pass, passConfirm string, o *options.Options) error {

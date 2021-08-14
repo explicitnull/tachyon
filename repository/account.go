@@ -155,8 +155,8 @@ func SetPassword(aClient *aerospike.Client, username, hash string) error {
 	return nil
 }
 
-func SetAccountStatus(le *logrus.Entry, aclient *aerospike.Client, name string, status string) error {
-	err := setBinString(aclient, accountsSet, "status", status, name)
+func SetAccountStatus(le *logrus.Entry, aclient *aerospike.Client, username string, status string) error {
+	err := setBinString(aclient, accountsSet, username, "status", status)
 	if err != nil {
 		return err
 	}
@@ -223,7 +223,7 @@ func extractAccount(bins aerospike.BinMap) (*types.Account, error) {
 	uiRole, err := extractString(bins, "ui_role")
 	if err != nil {
 		return nil, err
-	}  
+	}
 
 	acc := &types.Account{
 		Name:                     username,
