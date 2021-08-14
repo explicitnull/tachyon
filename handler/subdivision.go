@@ -46,3 +46,26 @@ func (g *Gateway) ShowSubdivisions(w http.ResponseWriter, r *http.Request) {
 
 	executeFooterTemplate(le, w)
 }
+
+func (g *Gateway) CreateSubdivision(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	le := getLogger(r)
+
+	username, ok := ctx.Value("username").(string)
+	if !ok {
+		le.Warn("no username in context")
+		return
+	}
+
+	if repository.GetRole(le, g.aerospikeClient, username) != "admin" {
+		le.Warn("access forbidden")
+		http.Error(w, "access forbidden", http.StatusForbidden)
+		return
+	}
+
+	executeHeaderTemplate(le, w, username)
+
+	executeTemplate(le, w, "subdiv_new.htm", nil)
+
+	executeFooterTemplate(le, w)
+}

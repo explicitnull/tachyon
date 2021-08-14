@@ -327,7 +327,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// redirecting back
-	http.Redirect(w, r, r.URL.String(), http.StatusTemporaryRedirect)
+	http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
 }
 
 func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
@@ -355,7 +355,7 @@ func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// getting account data from DB
+	// applying changes
 	err := repository.SetAccountStatus(le, name, types.AccountStatusSuspended)
 	if err != nil {
 		le.WithError(err).Error("setting account status failure")

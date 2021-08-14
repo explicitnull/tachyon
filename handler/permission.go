@@ -217,5 +217,5 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// redirecting back
-	http.Redirect(w, r, r.URL.String(), http.StatusTemporaryRedirect)
+	http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
 }

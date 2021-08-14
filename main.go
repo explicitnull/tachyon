@@ -88,6 +88,7 @@ func main() {
 	r.HandleFunc("/editpermission/{name}/", g.EditPermissionAction).Methods("POST")
 
 	r.HandleFunc("/subdiv/", g.ShowSubdivisions).Methods("GET")
+	r.HandleFunc("/subdiv/new/", g.CreateSubdivision).Methods("GET")
 
 	r.HandleFunc("/equipment/", g.ShowEquipment).Methods("GET")
 
@@ -102,7 +103,7 @@ func main() {
 	// antibruteforce handler
 	r.HandleFunc("/lockout/", g.ShowLockouts)
 
-	// mx.HandleFunc("/adm/", adm)
+	r.HandleFunc("/settings/", g.ShowAccounting).Methods("GET")
 
 	r.Use(m.Log)
 	r.Use(m.CheckCookie)
