@@ -27,19 +27,19 @@ func ShowAuthentication(le *logrus.Entry, aclient *aerospike.Client) ([]types.Au
 	return items, nil
 }
 
-func SearchAuthentication(le *logrus.Entry, field, value string, begin, end time.Time, aclient *aerospike.Client) []types.AccountingRecord {
-	items := make([]types.AccountingRecord, 0)
+func SearchAuthentication(le *logrus.Entry, field, value string, begin, end time.Time, aclient *aerospike.Client) []types.Authentication {
+	items := make([]types.Authentication, 0)
 
 	var err error
 
 	if value != "" {
-		items, err = repository.GetAccountingWithEqualFilter(le, aclient, field, value)
+		items, err = repository.GetAuthenticationWithEqualFilter(le, aclient, field, value)
 		if err != nil {
 			le.WithError(err).Error("searching accounting failed")
 			return nil
 		}
 	} else {
-		items, err = repository.GetAccountingWithTimeFilter(le, aclient, begin, end)
+		items, err = repository.GetAuthenticationWithTimeFilter(le, aclient, begin, end)
 		if err != nil {
 			le.WithError(err).Error("searching accounting failed")
 			return nil

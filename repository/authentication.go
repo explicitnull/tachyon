@@ -33,6 +33,26 @@ func GetAuthentications(le *logrus.Entry, aclient *aerospike.Client) ([]types.Au
 	return result, nil
 }
 
+func GetAuthenticationWithEqualFilter(le *logrus.Entry, aclient *aerospike.Client, field, value string) ([]types.Authentication, error) {
+	res := make([]types.Authentication, 0)
+
+	records, err := getRecordsWithEqualFilter(aclient, authenticationsSet, field, value)
+	if err != nil {
+		return res, err
+	}
+
+	for _, v := range records {
+		aut, err := extractAuthentication(v.Bins)
+		if err != nil {
+			return nil, err
+		}
+
+		res = append(res, aut)
+	}
+
+	return res, nil
+}
+
 func GetAuthenticationWithTimeFilter(le *logrus.Entry, aclient *aerospike.Client, begin, end time.Time) ([]types.Authentication, error) {
 	le.Debugf("repo time begin: %s, end: %s", begin, end)
 

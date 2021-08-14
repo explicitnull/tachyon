@@ -95,7 +95,7 @@ func main() {
 	// tacplus logs handlers
 
 	r.HandleFunc("/auth/", g.ShowAuthentication).Methods("GET")
-	// r.HandleFunc("/auth_search/", g.SearchAuthentications)
+	r.HandleFunc("/auth_search/", g.SearchAuthentication).Methods("POST")
 
 	r.HandleFunc("/acct/", g.ShowAccounting).Methods("GET")
 	r.HandleFunc("/acct-search/", g.SearchAccounting).Methods("POST")
