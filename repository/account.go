@@ -45,6 +45,38 @@ func GetAccounts(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Account,
 	return result, nil
 }
 
+func GetAccountByName(le *logrus.Entry, client *aerospike.Client, name string) (*types.Account, error) {
+	var key *aerospike.Key
+
+	skey := name
+	key, err := aerospike.NewKey(namespace, accountsSet, skey)
+	panicOnError(err)
+
+	policy := aerospike.NewPolicy()
+	policy.SleepBetweenRetries = 50 * time.Millisecond
+	policy.MaxRetries = 10
+	policy.SleepMultiplier = 2.0
+
+	rec, err := client.Get(policy, key)
+	if err != nil {
+		le.WithError(err).Error("aerospike query failed")
+		return nil, err
+	}
+
+	if rec == nil {
+		printError("record not found: namespace=%s accountsSet=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+		return nil, errors.New("record not found")
+	}
+
+	acc, err := extractAccount(rec.Bins)
+	if err != nil {
+		le.WithError(err).Error("extracting bins failed")
+		return nil, err
+	}
+
+	return acc, nil
+}
+
 // GetPasswordHash searches for password hash of given user
 func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string) (string, error) {
 	var key *aerospike.Key
@@ -118,55 +150,41 @@ func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail
 	return nil
 }
 
-func GetAccountByName(le *logrus.Entry, client *aerospike.Client, name string) (*types.Account, error) {
-	var key *aerospike.Key
-
-	skey := name
-	key, err := aerospike.NewKey(namespace, accountsSet, skey)
-	panicOnError(err)
-
-	policy := aerospike.NewPolicy()
-	policy.SleepBetweenRetries = 50 * time.Millisecond
-	policy.MaxRetries = 10
-	policy.SleepMultiplier = 2.0
-
-	rec, err := client.Get(policy, key)
-	if err != nil {
-		le.WithError(err).Error("aerospike query failed")
-		return nil, err
-	}
-
-	if rec == nil {
-		printError("record not found: namespace=%s accountsSet=%s key=%v", key.Namespace(), key.SetName(), key.Value())
-		return nil, errors.New("record not found")
-	}
-
-	acc, err := extractAccount(rec.Bins)
-	if err != nil {
-		le.WithError(err).Error("extracting bins failed")
-		return nil, err
-	}
-
-	return acc, nil
-}
-
 func SetPassword(aClient *aerospike.Client, username, hash string) error {
+	// TODO: pass
 	return nil
 }
 
-func SetAccountStatus(le *logrus.Entry, name string, status string) error {
+func SetAccountStatus(le *logrus.Entry, aclient *aerospike.Client, name string, status string) error {
+	key, err := aerospike.NewKey(namespace, accountsSet, name)
+	if err != nil {
+		return err
+	}
+
+	policy := aerospike.NewWritePolicy(0, 0)
+
+	st := aerospike.NewBin("status", status)
+
+	_, err = aclient.Operate(policy, key, aerospike.PutOp(st))
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func SetSubdivision(name string, subdiv string) error {
+	// TODO: subdiv
 	return nil
 }
 
 func SetPermission(name string, perm string) error {
+	// TODO: perm
 	return nil
 }
 
 func SetMail(name string, mail string) error {
+	// TODO: email
 	return nil
 }
 

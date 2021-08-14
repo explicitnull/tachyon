@@ -70,7 +70,7 @@ func (g *Gateway) ChangePasswordAction(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "<p>Пароль изменен.</p>")
 }
 
-func changePasswordAction(le *logrus.Entry, aClient *aerospike.Client, authenticatedUsername, pass, passConfirm string, o *options.Options) error {
+func changePasswordAction(le *logrus.Entry, aclient *aerospike.Client, authenticatedUsername, pass, passConfirm string, o *options.Options) error {
 	// checking if passwords don't match
 	if pass != passConfirm {
 		return errPasswordsMismatch
@@ -92,7 +92,7 @@ func changePasswordAction(le *logrus.Entry, aClient *aerospike.Client, authentic
 	// changing password
 	hash := makeHash(le, pass)
 
-	err := repository.SetPassword(aClient, authenticatedUsername, hash)
+	err := repository.SetPassword(aclient, authenticatedUsername, hash)
 	if err != nil {
 		le.WithError(err).Error("password update failed")
 		return err
@@ -116,7 +116,7 @@ func changePasswordAction(le *logrus.Entry, aClient *aerospike.Client, authentic
 	*/
 
 	// activating user
-	err = repository.SetAccountStatus(le, authenticatedUsername, "active")
+	err = repository.SetAccountStatus(le, aclient, authenticatedUsername, "active")
 	if err != nil {
 		le.WithError(err).Error("user activation failed")
 		return err

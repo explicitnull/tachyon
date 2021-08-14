@@ -320,14 +320,16 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if fac.Status != dbac.Status {
-		err = repository.SetAccountStatus(le, fac.Name, fac.Status)
+		err = repository.SetAccountStatus(le, g.aerospikeClient, fac.Name, fac.Status)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
+			return
 		}
 	}
 
 	// redirecting back
-	http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
+	// http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
+	fmt.Fprintf(w, "ok")
 }
 
 func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
@@ -356,7 +358,7 @@ func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// applying changes
-	err := repository.SetAccountStatus(le, name, types.AccountStatusSuspended)
+	err := repository.SetAccountStatus(le, g.aerospikeClient, name, types.AccountStatusSuspended)
 	if err != nil {
 		le.WithError(err).Error("setting account status failure")
 		http.Error(w, "setting account status failure", http.StatusInternalServerError)

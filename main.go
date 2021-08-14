@@ -15,6 +15,7 @@ import (
 
 const appName = "tacacs-webconsole"
 
+// TODO: move to env
 var (
 	host      = "13.48.3.15"
 	port      = 3000
@@ -41,6 +42,7 @@ func main() {
 
 	log.SetLevel(log.InfoLevel)
 
+	// TODO: pg support
 	// db := database.Open(appOptions.DbHost, appOptions.DbName, appOptions.DbName, appOptions.DbPassword)
 
 	aerospikeClient, err := aerospike.NewClient(host, port)
@@ -48,8 +50,9 @@ func main() {
 		log.Fatalf("aerospike init failed: %v", err)
 	}
 
-	var hashKey = []byte("secret")
-	var blockKey = []byte("1234567890123456")
+	// TODO: move to config
+	hashKey := []byte("secret")
+	blockKey := []byte("1234567890123456")
 	sCookie := cookieInit(hashKey, blockKey)
 
 	// handlers
@@ -114,6 +117,7 @@ func main() {
 	serveSingle("/favicon.ico", "./favicon.ico")
 	http.Handle("/", r)
 
+	// server
 	log.Warn("listening http on port 8000")
 	err = http.ListenAndServe(":8000", nil)
 	if err != nil {
