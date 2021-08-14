@@ -1,7 +1,7 @@
 // Feb  2 18:41:38	192.168.0.202	jathan	ttyp1	192.168.0.10	stop	task_id=3	service=shell	process*mgd[7741]	cmd=configure exclusive <cr>
-// insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('1jcnrdeslA', '1jcnrdeslA', 1610000000, '12.12.12.12', 'device34', 'admin', '45.67.89.90', 'reverse.example.com', 'login <cr>')
+// insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('1jcnrdeslA', '1jcnrdeslA', 1610000000, '12.12.12.12', 'device34', 'superuser', '45.67.89.90', 'reverse.example.com', 'login <cr>')
 // insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('aFCHxkuria', 'aFCHxkuria', 1600000000, '10.10.10.10', 'device01', 'jathan', '45.67.89.90', 'reverse.example.com', 'configure exclusive <cr>')
-// insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('abCHKRtpav', 'abCHKRtpav', 1610000000, '11.11.11.11', 'device22', 'admin', '45.67.89.90', 'reverse.example.com', 'set system login class view-only permissions [ view view-configuration ] <cr>')
+// insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('abCHKRtpav', 'abCHKRtpav', 1610000000, '11.11.11.11', 'device22', 'superuser', '45.67.89.90', 'reverse.example.com', 'set system login class view-only permissions [ view view-configuration ] <cr>')
 // insert into tacacs.accounting(PK, id, ts, device_ip, device_name, account, user_ip, user_fqdn, command) values ('abCHKRtpaz', 'abCHKRtpaz', 1628772960, '13.13.13.13', 'rtr23', 'furai', '3.4.5.6', 'reverse.example.com', 'login')
 
 package repository

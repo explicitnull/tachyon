@@ -1,0 +1,18 @@
+<h3 class="test-header">Options</h3>
+</div>
+<div class="test-demo">
+    <div class="test-body">
+        <table class="table is-striped">
+            <thead>
+                <th>Name</th>
+                <th>Value</th>
+            </thead>
+            {{ range .Items}}
+            <tr>
+                <td>{{ .Name }}</a></td>
+                <td>{{ .Value }}</td>
+            </tr>
+            {{ end}}
+        </table>
+    </div>
+</div>

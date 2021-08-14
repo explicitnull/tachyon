@@ -103,7 +103,7 @@ func main() {
 	// antibruteforce handler
 	r.HandleFunc("/lockout/", g.ShowLockouts)
 
-	r.HandleFunc("/settings/", g.ShowAccounting).Methods("GET")
+	r.HandleFunc("/settings/", g.ShowOptions).Methods("GET")
 
 	r.Use(m.Log)
 	r.Use(m.CheckCookie)

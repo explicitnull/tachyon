@@ -1,4 +1,4 @@
-// insert into tacacs.lockouts (PK, ip, fqdn, attempts, first_ts, last_ts, last_device, last_account) values ('38.253.3.135', '3.example.com', 41, '2021-07-12 19:00', '2021-07-23 10:00', 'stkm-core01', 'admin')
+// insert into tacacs.lockouts (PK, ip, fqdn, attempts, first_ts, last_ts, last_device, last_account) values ('38.253.3.135', '3.example.com', 41, '2021-07-12 19:00', '2021-07-23 10:00', 'stkm-core01', 'superuser')
 package repository
 
 import (

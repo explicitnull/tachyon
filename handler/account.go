@@ -93,7 +93,7 @@ func (g *Gateway) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, username) != "admin" {
+	if repository.GetRole(le, g.aerospikeClient, username) != "superuser" {
 		le.Warn("access forbidden")
 		fmt.Fprintf(w, "access forbidden")
 		return
@@ -120,7 +120,7 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "admin" {
+	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
 		le.Warn("access forbidden")
 		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
@@ -201,7 +201,7 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "admin" {
+	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
 		le.Warn("access forbidden")
 		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
@@ -246,7 +246,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "admin" {
+	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
 		le.Warn("access forbidden")
 		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
@@ -340,7 +340,7 @@ func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "admin" {
+	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
 		le.Warn("access forbidden")
 		http.Error(w, "access forbidden", http.StatusForbidden)
 		return

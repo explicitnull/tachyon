@@ -50,7 +50,7 @@ func CreatePermission(le *logrus.Entry, client *aerospike.Client, p *types.Permi
 		return err
 	}
 
-	// insert into tacacs.permissions (PK, name, description, status, created_by, created_ts) values ('asia-rw', 'asia-rw', 'read only for asia', 'active', 'admin', '2009-01-02 18:00')
+	// insert into tacacs.permissions (PK, name, description, status, created_by, created_ts) values ('asia-rw', 'asia-rw', 'read only for asia', 'active', 'superuser', '2009-01-02 18:00')
 
 	// NOTE: bin name must be less than 16 characters
 	bins := aerospike.BinMap{
