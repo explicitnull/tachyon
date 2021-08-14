@@ -149,3 +149,21 @@ func getRecordsWithRangeFilter(aclient *aerospike.Client, setName, binName strin
 
 	return records, nil
 }
+
+func setBinString(aclient *aerospike.Client, setName, binName, value, key string) error {
+	akey, err := aerospike.NewKey(namespace, setName, key)
+	if err != nil {
+		return err
+	}
+
+	policy := aerospike.NewWritePolicy(0, 0)
+
+	st := aerospike.NewBin(binName, value)
+
+	_, err = aclient.Operate(policy, akey, aerospike.PutOp(st))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
