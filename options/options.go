@@ -23,6 +23,7 @@ type Options struct {
 	LogLevel           string // new
 }
 
+// TODO: read from db
 func Load(o *Options) error {
 	_, err := toml.DecodeFile(defaultOptionsFilename, &o)
 	if err != nil {

@@ -32,6 +32,7 @@ func main() {
 	log.Warnf("starting %s...", appName)
 
 	appOptions := new(options.Options)
+	appOptions.MinPassLen = 9
 
 	err := options.Load(appOptions)
 	if err != nil {
