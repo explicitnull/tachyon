@@ -6,11 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"os/exec"
-	"tacacs-webconsole/applogic"
-	"tacacs-webconsole/repository"
 	"time"
-
-	"github.com/aerospike/aerospike-client-go"
 
 	"github.com/gorilla/securecookie"
 	"github.com/sirupsen/logrus"
@@ -38,7 +34,7 @@ func (g *Gateway) LoginAction(w http.ResponseWriter, r *http.Request) {
 
 	le = le.WithField("username", username)
 
-	ok := loginAction(le, username, password, g.aerospikeClient, r)
+	ok := applogic.LoginAction(le, username, password, g.aerospikeClient)
 	if !ok {
 		t, err := template.ParseFiles("templates/loginerror.htm")
 		if err != nil {
@@ -68,37 +64,6 @@ func (g *Gateway) LoginAction(w http.ResponseWriter, r *http.Request) {
 	mid.Execute(w, nil)
 
 	le.Info("handled ok")
-}
-
-func loginAction(le *logrus.Entry, username, formPassword string, aClient *aerospike.Client, r *http.Request) bool {
-	dbhash, err := repository.GetPasswordHash(le, aClient, username)
-	if err != nil {
-		le.WithError(err).Errorf("GetPasswordHash() failed")
-		return false
-	}
-
-	if dbhash == "" {
-		le.Warning("user not found")
-		return false
-	}
-
-	// hashParts := strings.Split(dbhash, "$")
-	// if len(hashParts) != 3 {
-	// 	le.Error("wrong database hash format")
-	// 	return false
-	// }
-
-	// salt := hashParts[2]
-	formHash := applogic.MakeHash(le, formPassword)
-
-	if formHash != dbhash {
-		le.Warning("wrong password")
-		return false
-	}
-
-	le.Info("logged in")
-
-	return true
 }
 
 func setCookie(w http.ResponseWriter, username string, sc *securecookie.SecureCookie) error {
