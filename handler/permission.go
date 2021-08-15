@@ -209,7 +209,7 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 
 	// applying changes
 	if fperm.Description != "" && fperm.Description != dbperm.Description {
-		err = repository.SetPermissionDescription(le, name, fperm.Description)
+		err = repository.SetPermissionDescription(le, g.aerospikeClient, name, fperm.Description)
 		if err != nil {
 			http.Error(w, databaseError, http.StatusInternalServerError)
 			return
@@ -225,7 +225,9 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// redirecting back
-	http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
+	// http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
+
+	executeTemplate(le, w, "ok_then_redirect.htm", nil)
 
 	le.Info("handled ok")
 }

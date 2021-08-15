@@ -104,7 +104,12 @@ func SetPermissionStatus(le *logrus.Entry, name string, status string) error {
 	return nil
 }
 
-func SetPermissionDescription(le *logrus.Entry, name string, description string) error {
+func SetPermissionDescription(le *logrus.Entry, aclient *aerospike.Client, acname string, description string) error {
+	err := setBinString(aclient, permissionsSet, acname, "description", description)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
