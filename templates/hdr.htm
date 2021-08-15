@@ -40,22 +40,20 @@
                         onclick="javascript:location.href='/permissions/'" {{.Item6}}>Permissions</button>
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/subdiv/'"
                         {{.Item4}}>Subdivisions</button>
-                    <button type="button" class="button" role="button" onclick="javascript:location.href='/lockout/'"
-                        {{.Item3}}>Anti-bruteforce</button>
-                    <!--
-                        <button type="button" class="button" role="button" onclick="javascript:location.href='/equipment/'"
-                        {{.Item2}}>Оборудование</button>
--->
+                    <button type="button" class="button" role="button" onclick="javascript:location.href='/equipment/'"
+                        {{.Item2}} disabled>Equipment</button>
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/auth/'"
                         {{.Item7}}>Authentication log</button>
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/acct/'"
                         {{.Item8}}>Accounting log</button>
+                    <button type="button" class="button" role="button" onclick="javascript:location.href='/lockout/'"
+                        {{.Item3}}>Anti-bruteforce</button>
                     <!-- 
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/log/'"
                         {{.Item9}}>Лог</button>
 -->
                     <button type="button" class="button" role="button" onclick="javascript:location.href='/settings/'"
-                        {{.Item10}}>Tacasa settings</button>
+                        {{.Item10}}>Webconsole settings</button>
                 </div>
             </div>
             <!--<div id="skeleton" class="body">
