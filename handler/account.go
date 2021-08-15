@@ -3,13 +3,11 @@ package handler
 import (
 	"fmt"
 	"net/http"
+	"tacacs-webconsole/applogic"
 	"tacacs-webconsole/repository"
 	"tacacs-webconsole/types"
 
-	"github.com/aerospike/aerospike-client-go"
-	"github.com/dchest/uniuri"
 	"github.com/gorilla/mux"
-	"github.com/sirupsen/logrus"
 )
 
 const defaultAccountsPerPageLimit = 10
@@ -145,7 +143,7 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 
 	le.Debugf("%#v", acc)
 
-	cleartext, err := createUserAction(le, g.aerospikeClient, acc, authenticatedUsername)
+	cleartext, err := applogic.CreateUserAction(le, g.aerospikeClient, acc, authenticatedUsername)
 	if err != nil {
 		http.Error(w, "creating user failed", http.StatusInternalServerError)
 		return
@@ -162,40 +160,6 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 	executeFooterTemplate(le, w)
 
 	le.Info("handled ok")
-}
-
-func genPass() string {
-	return uniuri.NewLen(10)
-}
-
-func createUserAction(le *logrus.Entry, aClient *aerospike.Client, req types.Account, authenticatedUsername string) (string, error) {
-	// normalization
-	subdivID, err := repository.GetSubdivisionID(le, aClient, req.Subdivision)
-	if err != nil {
-		le.WithError(err).Error("getting subdivision ID failed")
-		return "", err
-	}
-
-	permisID, err := repository.GetPermId(le, aClient, req.Permission)
-	if err != nil {
-		le.WithError(err).Error("getting permission ID failed")
-		return "", err
-	}
-
-	cleartext := genPass()
-	le.Debug(cleartext)
-	hash := makeHash(le, cleartext)
-	le.Debug(hash)
-
-	err = repository.CreateUser(le, aClient, req.Name, hash, req.Mail, authenticatedUsername, permisID, subdivID)
-	if err != nil {
-		le.WithError(err).Errorf("error creating user")
-		return "", err
-	}
-
-	le.WithField("username", req.Name).Info("user created")
-
-	return cleartext, nil
 }
 
 func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
@@ -290,7 +254,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 
 	// applying changes
 	if fac.Cleartext != "" {
-		hash := makeHash(le, fac.Cleartext)
+		hash := applogic.MakeHash(le, fac.Cleartext)
 		le.Debug(hash)
 		err = repository.SetPassword(g.aerospikeClient, fac.Name, hash)
 		if err != nil {

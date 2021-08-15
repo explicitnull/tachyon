@@ -4,7 +4,6 @@ package repository
 
 import (
 	"errors"
-	"log"
 	"strconv"
 	"tacacs-webconsole/types"
 	"time"
@@ -40,7 +39,7 @@ func GetAccounts(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Account,
 
 	end := time.Now()
 	seconds := float64(end.Sub(begin)) / float64(time.Second)
-	log.Println("Elapsed time: ", seconds, " seconds")
+	le.Debug("Elapsed time: ", seconds, " seconds")
 
 	return result, nil
 }
