@@ -149,13 +149,16 @@ func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail
 	return nil
 }
 
-func SetPassword(aClient *aerospike.Client, username, hash string) error {
-	// TODO: pass
+func SetPassword(le *logrus.Entry, aclient *aerospike.Client, acname, hash string) error {
+	err := setBinString(aclient, accountsSet, acname, "pass", hash)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func SetAccountStatus(le *logrus.Entry, aclient *aerospike.Client, username string, status string) error {
-	err := setBinString(aclient, accountsSet, username, "status", status)
+func SetAccountStatus(le *logrus.Entry, aclient *aerospike.Client, acname string, status string) error {
+	err := setBinString(aclient, accountsSet, acname, "status", status)
 	if err != nil {
 		return err
 	}
@@ -163,18 +166,30 @@ func SetAccountStatus(le *logrus.Entry, aclient *aerospike.Client, username stri
 	return nil
 }
 
-func SetSubdivision(name string, subdiv string) error {
-	// TODO: subdiv
+func SetSubdivision(le *logrus.Entry, aclient *aerospike.Client, acname string, subdiv int) error {
+	err := setBinInt(aclient, accountsSet, acname, "subdiv_id", subdiv)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func SetPermission(name string, perm string) error {
-	// TODO: perm
+func SetPermission(le *logrus.Entry, aclient *aerospike.Client, acname string, perm int) error {
+	err := setBinInt(aclient, accountsSet, acname, "permis_id", perm)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func SetMail(name string, mail string) error {
-	// TODO: email
+func SetMail(le *logrus.Entry, aclient *aerospike.Client, acname string, mail string) error {
+	err := setBinString(aclient, accountsSet, acname, "mail", mail)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

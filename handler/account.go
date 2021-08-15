@@ -174,7 +174,7 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 
 	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
 		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
+		http.Error(w, accessForbidden, http.StatusForbidden)
 		return
 	}
 
@@ -183,7 +183,7 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 	name, ok := vars["name"]
 	if !ok {
 		le.Error(noIDinURL)
-		http.Error(w, "bad request", http.StatusBadRequest)
+		http.Error(w, badRequest, http.StatusBadRequest)
 		return
 	}
 
@@ -191,7 +191,7 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 	acc, err := repository.GetAccountByName(le, g.aerospikeClient, name)
 	if err != nil {
 		le.WithError(err).Error("getting account failed")
-		http.Error(w, "server error", http.StatusInternalServerError)
+		http.Error(w, serverError, http.StatusInternalServerError)
 		return
 	}
 
@@ -244,55 +244,10 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		Status:      r.PostFormValue("status"),
 	}
 
-	// getting account data from DB
-	dbac, err := repository.GetAccountByName(le, g.aerospikeClient, fac.Name)
+	err := applogic.EditAccountAction(le, g.aerospikeClient, fac)
 	if err != nil {
-		le.WithError(err).Error("getting account failed")
-		http.Error(w, "server error", http.StatusInternalServerError)
+		http.Error(w, serverError, http.StatusInternalServerError)
 		return
-	}
-
-	// applying changes
-	if fac.Cleartext != "" {
-		hash := applogic.MakeHash(le, fac.Cleartext)
-		le.Debug(hash)
-		err = repository.SetPassword(g.aerospikeClient, fac.Name, hash)
-		if err != nil {
-			http.Error(w, databaseError, http.StatusInternalServerError)
-			return
-		}
-	}
-
-	if fac.Subdivision != emptySelect && fac.Subdivision != dbac.Subdivision {
-		err = repository.SetSubdivision(fac.Name, fac.Subdivision)
-		if err != nil {
-			http.Error(w, databaseError, http.StatusInternalServerError)
-			return
-		}
-	}
-
-	if fac.Permission != emptySelect && fac.Permission != dbac.Permission {
-		err = repository.SetSubdivision(fac.Name, fac.Subdivision)
-		if err != nil {
-			http.Error(w, databaseError, http.StatusInternalServerError)
-			return
-		}
-	}
-
-	if fac.Mail != "" && fac.Mail != dbac.Mail {
-		err = repository.SetMail(fac.Name, fac.Mail)
-		if err != nil {
-			http.Error(w, databaseError, http.StatusInternalServerError)
-			return
-		}
-	}
-
-	if fac.Status != dbac.Status {
-		err = repository.SetAccountStatus(le, g.aerospikeClient, fac.Name, fac.Status)
-		if err != nil {
-			http.Error(w, databaseError, http.StatusInternalServerError)
-			return
-		}
 	}
 
 	// redirecting back

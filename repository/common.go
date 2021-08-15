@@ -167,3 +167,21 @@ func setBinString(aclient *aerospike.Client, setName, key, binName, value string
 
 	return nil
 }
+
+func setBinInt(aclient *aerospike.Client, setName, key, binName string, value int) error {
+	akey, err := aerospike.NewKey(namespace, setName, key)
+	if err != nil {
+		return err
+	}
+
+	policy := aerospike.NewWritePolicy(0, 0)
+
+	st := aerospike.NewBin(binName, value)
+
+	_, err = aclient.Operate(policy, akey, aerospike.PutOp(st))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

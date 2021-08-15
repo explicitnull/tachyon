@@ -36,7 +36,7 @@ func GetSubdivisionID(le *logrus.Entry, aClient *aerospike.Client, div string) (
 }
 
 func GetSubdivisionsList(le *logrus.Entry, aclient *aerospike.Client) []string {
-	return []string{"europe", "asia"}
+	return []string{"1", "2"}
 }
 
 func extractSubdivision(bins aerospike.BinMap) (*types.Subdivision, error) {

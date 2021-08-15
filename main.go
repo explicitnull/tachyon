@@ -122,7 +122,7 @@ func main() {
 	// server
 	// TODO: move port to conf
 	log.Warn("starting http server on port 8000")
-	err = http.ListenAndServe("192.168.1.48:8000", nil)
+	err = http.ListenAndServe("0.0.0.0:8000", nil)
 	if err != nil {
 		log.Fatalf("starting HTTP server failed: %v", err)
 	}

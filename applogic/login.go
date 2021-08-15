@@ -26,14 +26,12 @@ func LoginAction(le *logrus.Entry, username, formPassword string, aClient *aeros
 	// }
 
 	// salt := hashParts[2]
-	formHash := applogic.MakeHash(le, formPassword)
+	formHash := MakeHash(le, formPassword)
 
 	if formHash != dbhash {
 		le.Warning("wrong password")
 		return false
 	}
-
-	le.Info("logged in")
 
 	return true
 }

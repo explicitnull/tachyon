@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"errors"
 	"regexp"
+	"strconv"
 	"strings"
 	"tacacs-webconsole/options"
 	"tacacs-webconsole/repository"
@@ -51,17 +52,6 @@ func CreateUserAction(le *logrus.Entry, aClient *aerospike.Client, req types.Acc
 	return cleartext, nil
 }
 
-func genPass() string {
-	return uniuri.NewLen(10)
-}
-
-// MakeHash generates SHA hashes for given passwords
-func MakeHash(le *logrus.Entry, cleartext string) string {
-	hash := sha256.Sum256([]byte(cleartext))
-	enc := base64.StdEncoding.EncodeToString(hash[:])
-	return strings.Replace(enc, "=", "", -1)
-}
-
 func ChangePasswordAction(le *logrus.Entry, aclient *aerospike.Client, authenticatedUsername, pass, passConfirm string, o *options.Options) error {
 	// checking if passwords don't match
 	if pass != passConfirm {
@@ -84,7 +74,7 @@ func ChangePasswordAction(le *logrus.Entry, aclient *aerospike.Client, authentic
 	// changing password
 	hash := MakeHash(le, pass)
 
-	err := repository.SetPassword(aclient, authenticatedUsername, hash)
+	err := repository.SetPassword(le, aclient, authenticatedUsername, hash)
 	if err != nil {
 		le.WithError(err).Error("password update failed")
 		return err
@@ -117,4 +107,75 @@ func ChangePasswordAction(le *logrus.Entry, aclient *aerospike.Client, authentic
 	le.Info("user status switched to active due to password update")
 
 	return nil
+}
+
+func EditAccountAction(le *logrus.Entry, aclient *aerospike.Client, fac *types.Account) error {
+	// getting account data from DB
+	dbac, err := repository.GetAccountByName(le, aclient, fac.Name)
+	if err != nil {
+		le.WithError(err).Error("getting account failed")
+		return err
+	}
+
+	// applying changes
+	if fac.Cleartext != "" {
+		hash := MakeHash(le, fac.Cleartext)
+		err = repository.SetPassword(le, aclient, fac.Name, hash)
+		if err != nil {
+			return err
+		}
+	}
+
+	if fac.Subdivision != "--" && fac.Subdivision != dbac.Subdivision {
+		subdivID, err := strconv.Atoi(fac.Subdivision)
+		if err != nil {
+			return err
+		}
+
+		err = repository.SetSubdivision(le, aclient, fac.Name, subdivID)
+		if err != nil {
+			return err
+		}
+	}
+
+	if fac.Permission != "--" && fac.Permission != dbac.Permission {
+		permisID, err := strconv.Atoi(fac.Permission)
+		if err != nil {
+			return err
+		}
+
+		err = repository.SetPermission(le, aclient, fac.Name, permisID)
+		if err != nil {
+			return err
+		}
+	}
+
+	if fac.Mail != "" && fac.Mail != dbac.Mail {
+		err = repository.SetMail(le, aclient, fac.Name, fac.Mail)
+		if err != nil {
+			return err
+		}
+	}
+
+	if fac.Status != dbac.Status {
+		err = repository.SetAccountStatus(le, aclient, fac.Name, fac.Status)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func genPass() string {
+	return uniuri.NewLen(10)
+}
+
+// MakeHash generates SHA hashes for given passwords
+func MakeHash(le *logrus.Entry, cleartext string) string {
+	hash := sha256.Sum256([]byte(cleartext))
+	le.Debug(hash)
+
+	enc := base64.StdEncoding.EncodeToString(hash[:])
+	return strings.Replace(enc, "=", "", -1)
 }

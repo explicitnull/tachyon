@@ -19,8 +19,6 @@ const (
 	accessForbidden = "access forbidden"
 )
 
-const emptySelect = "--"
-
 func getLogger(r *http.Request) *logrus.Entry {
 	ctx := r.Context()
 	le := logrus.WithField("requestID", ctx.Value("requestID")).WithField("username", ctx.Value("username"))

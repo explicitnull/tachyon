@@ -37,7 +37,7 @@ func GetPermId(le *logrus.Entry, aClient *aerospike.Client, prm string) (int, er
 }
 
 func GetPermissionsList(le *logrus.Entry, aclient *aerospike.Client) []string {
-	return []string{"rw", "ro"}
+	return []string{"11", "12"}
 }
 
 func CreatePermission(le *logrus.Entry, client *aerospike.Client, p *types.Permission) error {
