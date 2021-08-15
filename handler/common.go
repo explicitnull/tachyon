@@ -1,11 +1,8 @@
 package handler
 
 import (
-	"crypto/sha256"
-	"encoding/base64"
 	"html/template"
 	"net/http"
-	"strings"
 	"tacacs-webconsole/types"
 
 	"github.com/sirupsen/logrus"
@@ -88,11 +85,4 @@ func executeTemplate(le *logrus.Entry, w http.ResponseWriter, filename string, d
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-}
-
-// makeHash generates SHA hashes for given passwords
-func makeHash(le *logrus.Entry, cleartext string) string {
-	hash := sha256.Sum256([]byte(cleartext))
-	enc := base64.StdEncoding.EncodeToString(hash[:])
-	return strings.Replace(enc, "=", "", -1)
 }

@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"os/exec"
+	"tacacs-webconsole/applogic"
 	"tacacs-webconsole/repository"
 	"time"
 
@@ -88,7 +89,7 @@ func loginAction(le *logrus.Entry, username, formPassword string, aClient *aeros
 	// }
 
 	// salt := hashParts[2]
-	formHash := makeHash(le, formPassword)
+	formHash := applogic.MakeHash(le, formPassword)
 
 	if formHash != dbhash {
 		le.Warning("wrong password")
