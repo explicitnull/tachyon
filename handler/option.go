@@ -83,7 +83,7 @@ func (g *Gateway) ShowOptions(w http.ResponseWriter, r *http.Request) {
 // 	dbo, err := repository.GetOptions(le, g.aerospikeClient)
 // 	if err != nil {
 // 		le.WithError(err).Error("getting option failed")
-// 		http.Error(w, databaseError, http.StatusInternalServerError)
+// 		http.Error(w, serverError, http.StatusInternalServerError)
 // 		return
 // 	}
 
@@ -91,7 +91,7 @@ func (g *Gateway) ShowOptions(w http.ResponseWriter, r *http.Request) {
 // 	if fo.MinimumPasswordLength != dbo.MinimumPasswordLength {
 // 		err = repository.SetOptionMinimumPasswordLength(le, fo.MinimumPasswordLength)
 // 		if err != nil {
-// 			http.Error(w, databaseError, http.StatusInternalServerError)
+// 			http.Error(w, serverError, http.StatusInternalServerError)
 // 			return
 // 		}
 // 	}

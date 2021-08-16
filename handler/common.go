@@ -14,7 +14,6 @@ const timeShort = "2006-01-02 15:04"
 const (
 	noIDinURL       = "no id in URL"
 	badRequest      = "bad request"
-	databaseError   = "database error"
 	serverError     = "server error"
 	accessForbidden = "access forbidden"
 )
@@ -83,4 +82,6 @@ func executeTemplate(le *logrus.Entry, w http.ResponseWriter, filename string, d
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
+
+	// TODO: return err
 }

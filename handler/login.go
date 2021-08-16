@@ -56,13 +56,7 @@ func (g *Gateway) LoginAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	mid, err := template.ParseFiles("templates/loginok.htm")
-	if err != nil {
-		le.WithError(err).Error("template parsing failed")
-		http.Error(w, "template parsing failed", http.StatusInternalServerError)
-		return
-	}
-	mid.Execute(w, nil)
+	executeTemplate(le, w, "loginok.htm", nil)
 
 	le.Info("handled ok")
 }

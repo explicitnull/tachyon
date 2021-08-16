@@ -203,7 +203,7 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	dbperm, err := repository.GetPermissionByName(le, g.aerospikeClient, fperm.Name)
 	if err != nil {
 		le.WithError(err).Error("getting permission failed")
-		http.Error(w, databaseError, http.StatusInternalServerError)
+		http.Error(w, serverError, http.StatusInternalServerError)
 		return
 	}
 
@@ -211,7 +211,7 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	if fperm.Description != "" && fperm.Description != dbperm.Description {
 		err = repository.SetPermissionDescription(le, g.aerospikeClient, name, fperm.Description)
 		if err != nil {
-			http.Error(w, databaseError, http.StatusInternalServerError)
+			http.Error(w, serverError, http.StatusInternalServerError)
 			return
 		}
 	}
@@ -219,7 +219,7 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	if fperm.Status != dbperm.Status {
 		err = repository.SetPermissionStatus(le, name, fperm.Status)
 		if err != nil {
-			http.Error(w, databaseError, http.StatusInternalServerError)
+			http.Error(w, serverError, http.StatusInternalServerError)
 			return
 		}
 	}
@@ -227,7 +227,16 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	// redirecting back
 	// http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
 
-	executeTemplate(le, w, "ok_then_redirect.htm", nil)
+	// type Redirect struct {
+	// 	Path string
+	// }
+
+	// redirect := Redirect{
+	// 	Path: fmt.Sprintf("/edituser/%s/", name),
+	// }
+
+	// executeTemplate(le, w, "ok_then_redirect.htm", redirect)
+	executeTemplate(le, w, "loginok.htm", nil)
 
 	le.Info("handled ok")
 }
