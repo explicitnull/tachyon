@@ -18,6 +18,10 @@ const (
 	accessForbidden = "access forbidden"
 )
 
+type Notice struct {
+	Message string
+}
+
 func getLogger(r *http.Request) *logrus.Entry {
 	ctx := r.Context()
 	le := logrus.WithField("requestID", ctx.Value("requestID")).WithField("username", ctx.Value("username"))

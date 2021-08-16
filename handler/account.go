@@ -257,7 +257,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	le.Info("handled ok")
 }
 
-func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
+func (g *Gateway) RemoveAccount(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	le := getLogger(r)
 
@@ -283,21 +283,21 @@ func (g *Gateway) DisableAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// applying changes
-	err := repository.SetAccountStatus(le, g.aerospikeClient, name, types.AccountStatusSuspended)
+	err := applogic.RemoveAccount(le, g.aerospikeClient, name, authenticatedUsername)
 	if err != nil {
 		le.WithError(err).Error("setting account status failure")
 		http.Error(w, "setting account status failure", http.StatusInternalServerError)
 		return
 	}
 
-	acc := types.Account{
-		Name: name,
+	notice := Notice{
+		Message: fmt.Sprintf("Account %s is now disabled", name),
 	}
 
 	// writing response
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	executeTemplate(le, w, "account_disabled.htm", acc)
+	executeTemplate(le, w, "notice.htm", notice)
 
 	executeFooterTemplate(le, w)
 

@@ -185,3 +185,19 @@ func setBinInt(aclient *aerospike.Client, setName, key, binName string, value in
 
 	return nil
 }
+
+func deleteRecord(aclient *aerospike.Client, setName, key string) (bool, error) {
+	akey, err := aerospike.NewKey(namespace, setName, key)
+	if err != nil {
+		return false, err
+	}
+
+	policy := aerospike.NewWritePolicy(0, 0)
+
+	existed, err := aclient.Delete(policy, akey)
+	if err != nil {
+		return false, err
+	}
+
+	return existed, nil
+}

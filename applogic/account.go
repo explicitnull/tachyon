@@ -167,6 +167,15 @@ func EditAccountAction(le *logrus.Entry, aclient *aerospike.Client, fac *types.A
 	return nil
 }
 
+func RemoveAccount(le *logrus.Entry, aclient *aerospike.Client, acname, authenticatedUsername string) error {
+	err := repository.DeleteAccount(le, aclient, acname, authenticatedUsername)
+	if err != nil {
+		return nil
+	}
+
+	return nil
+}
+
 func genPass() string {
 	return uniuri.NewLen(10)
 }

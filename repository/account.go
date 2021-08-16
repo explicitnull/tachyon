@@ -193,6 +193,15 @@ func SetMail(le *logrus.Entry, aclient *aerospike.Client, acname string, mail st
 	return nil
 }
 
+func DeleteAccount(le *logrus.Entry, aclient *aerospike.Client, acname, authenticatedUsername string) error {
+	_, err := deleteRecord(aclient, accountsSet, acname)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func extractAccount(bins aerospike.BinMap) (*types.Account, error) {
 	username, err := extractString(bins, "username")
 	if err != nil {
