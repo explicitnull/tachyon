@@ -21,17 +21,11 @@ var (
 	port = 3000
 )
 
-func init() {
-	// log.SetFormatter(&log.JSONFormatter{})
-	log.SetOutput(os.Stdout)
-
-}
-
 func main() {
+	loggingInit()
+
 	// TODO: add govvv
 	log.Warnf("starting %s", appName)
-	log.SetLevel(log.InfoLevel)
-
 	log.Warnf("establishing connection to database")
 
 	// TODO: pg support
@@ -116,7 +110,7 @@ func main() {
 
 	// TODO: move serving assets to standalone proxy like nginx
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
-	serveSingle("/favicon.ico", "./favicon.ico")
+	serveSingle("/favicon.ico", "assets/favicon.ico")
 	http.Handle("/", r)
 
 	// server
@@ -130,6 +124,12 @@ func main() {
 
 func cookieInit(hashKey, blockKey []byte) *securecookie.SecureCookie {
 	return securecookie.New(hashKey, blockKey)
+}
+
+func loggingInit() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+	log.SetLevel(log.InfoLevel)
 }
 
 func serveSingle(pattern string, filename string) {
