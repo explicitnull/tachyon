@@ -22,6 +22,7 @@ func (g *Gateway) ShowEquipment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// TODO: eqp
 	items, _ := repository.GetSubdivisions(le, g.aerospikeClient)
 
 	subdivs := &types.Subdivisions{
