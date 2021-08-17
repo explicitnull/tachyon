@@ -193,6 +193,15 @@ func SetMail(le *logrus.Entry, aclient *aerospike.Client, acname string, mail st
 	return nil
 }
 
+func SetUIRole(le *logrus.Entry, aclient *aerospike.Client, acname string, role string) error {
+	err := setBinString(aclient, accountsSet, acname, "ui_role", role)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func DeleteAccount(le *logrus.Entry, aclient *aerospike.Client, acname, authenticatedUsername string) error {
 	_, err := deleteRecord(aclient, accountsSet, acname)
 	if err != nil {

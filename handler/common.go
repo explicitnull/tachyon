@@ -19,6 +19,7 @@ const (
 )
 
 type Notice struct {
+	Title   string
 	Message string
 }
 

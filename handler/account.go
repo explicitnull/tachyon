@@ -151,11 +151,12 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 
 	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	uc := UserCreated{
-		Name:      acc.Name,
-		Cleartext: cleartext,
+	notice := Notice{
+		Title:   "New account",
+		Message: fmt.Sprintf("User created. Username: \"%s\", password: \"%s\". Network access will be provided in a few minutes.", acc.Name, cleartext),
 	}
-	executeTemplate(le, w, "usercreated.htm", uc)
+
+	executeTemplate(le, w, "notice.htm", notice)
 
 	executeFooterTemplate(le, w)
 
@@ -242,6 +243,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		Permission:  r.PostFormValue("perm"),
 		Mail:        r.PostFormValue("m"),
 		Status:      r.PostFormValue("status"),
+		UIRole:      r.PostFormValue("ui_role"),
 	}
 
 	err := applogic.EditAccountAction(le, g.aerospikeClient, fac)
@@ -250,9 +252,17 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// redirecting back
-	// http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
-	fmt.Fprintf(w, "ok")
+	notice := Notice{
+		Title:   fmt.Sprintf("Account \"%s\"", name),
+		Message: "Changes saved",
+	}
+
+	// writing response
+	executeHeaderTemplate(le, w, authenticatedUsername)
+
+	executeTemplate(le, w, "notice.htm", notice)
+
+	executeFooterTemplate(le, w)
 
 	le.Info("handled ok")
 }
@@ -291,7 +301,8 @@ func (g *Gateway) RemoveAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	notice := Notice{
-		Message: fmt.Sprintf("Account %s is now disabled", name),
+		Title:   fmt.Sprintf("Account \"%s\"", name),
+		Message: "Account is now disabled",
 	}
 
 	// writing response

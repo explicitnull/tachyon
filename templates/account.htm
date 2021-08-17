@@ -1,4 +1,4 @@
-<h2 class="test-header">Account "{{.Name}}" properties</h2>
+<h2 class="test-header">Account "{{.Name}}"</h2>
 
 <div class="test-body full">
     <form action="/edituser/{{.Name}}/" class="form--horizontal" method="post">
@@ -62,7 +62,16 @@
                         <div class="field-help">If set, user must change password</div>
                     </div>
                 </li>
-
+                <li>
+                    <label class="field-label col span-4">UI role</label>
+                    <div class="field-col col span-8">
+                        <select class="input" name="ui_role">
+                            <option></option>
+                            <option>manager</option>
+                            <option>superuser</option>
+                        </select>
+                    </div>
+                </li>
                 <li>
                     <label class="field-label col span-4"></label>
                     <div class="field-col col span-8">

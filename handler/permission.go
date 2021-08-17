@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
+	"tacacs-webconsole/applogic"
 	"tacacs-webconsole/repository"
 	"tacacs-webconsole/types"
 
@@ -188,7 +190,7 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.ParseForm()
-	fperm := &types.Permission{
+	fperm := types.Permission{
 		Name:        name,
 		Description: r.PostFormValue("descr"),
 		Status:      r.PostFormValue("status"),
@@ -199,44 +201,25 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	// 	fperm.Status = "active"
 	// }
 
-	// getting account data from DB
-	dbperm, err := repository.GetPermissionByName(le, g.aerospikeClient, fperm.Name)
+	// applying changes
+	err := applogic.EditPermissionAction(le, g.aerospikeClient, fperm)
 	if err != nil {
-		le.WithError(err).Error("getting permission failed")
+		le.WithError(err).Error("setting permission properties failure")
 		http.Error(w, serverError, http.StatusInternalServerError)
 		return
 	}
 
-	// applying changes
-	if fperm.Description != "" && fperm.Description != dbperm.Description {
-		err = repository.SetPermissionDescription(le, g.aerospikeClient, name, fperm.Description)
-		if err != nil {
-			http.Error(w, serverError, http.StatusInternalServerError)
-			return
-		}
+	notice := Notice{
+		Title:   fmt.Sprintf("Permission \"%s\"", name),
+		Message: "Changes saved",
 	}
 
-	if fperm.Status != dbperm.Status {
-		err = repository.SetPermissionStatus(le, name, fperm.Status)
-		if err != nil {
-			http.Error(w, serverError, http.StatusInternalServerError)
-			return
-		}
-	}
+	// writing response
+	executeHeaderTemplate(le, w, authenticatedUsername)
 
-	// redirecting back
-	// http.Redirect(w, r, r.URL.String()+"?from=editing", http.StatusTemporaryRedirect)
+	executeTemplate(le, w, "notice.htm", notice)
 
-	// type Redirect struct {
-	// 	Path string
-	// }
-
-	// redirect := Redirect{
-	// 	Path: fmt.Sprintf("/edituser/%s/", name),
-	// }
-
-	// executeTemplate(le, w, "ok_then_redirect.htm", redirect)
-	executeTemplate(le, w, "loginok.htm", nil)
+	executeFooterTemplate(le, w)
 
 	le.Info("handled ok")
 }

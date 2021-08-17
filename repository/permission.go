@@ -138,10 +138,12 @@ func extractPermission(bins aerospike.BinMap) (*types.Permission, error) {
 		return nil, err
 	}
 
-	perm.CreatedTimestamp, err = extractString(bins, "created_ts")
+	createdTs, err := extractInt(bins, "created_ts")
 	if err != nil {
 		return nil, err
 	}
+	tm := time.Unix(int64(createdTs), 0)
+	perm.CreatedTimestamp = tm.Format(types.TimeFormatSeconds)
 
 	return perm, nil
 }
