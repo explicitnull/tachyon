@@ -302,7 +302,7 @@ func (g *Gateway) RemoveAccount(w http.ResponseWriter, r *http.Request) {
 
 	notice := Notice{
 		Title:   fmt.Sprintf("Account \"%s\"", name),
-		Message: "Account is now disabled",
+		Message: "Account removed",
 	}
 
 	// writing response
