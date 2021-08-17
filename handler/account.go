@@ -153,7 +153,7 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 
 	notice := Notice{
 		Title:   "New account",
-		Message: fmt.Sprintf("User created. Username: \"%s\", password: \"%s\". Network access will be provided in a few minutes.", acc.Name, cleartext),
+		Message: fmt.Sprintf("User \"%s\" created. Password: \"%s\". Network access will be provided in a few minutes.", acc.Name, cleartext),
 	}
 
 	executeTemplate(le, w, "notice.htm", notice)

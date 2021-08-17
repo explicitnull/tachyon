@@ -86,13 +86,13 @@ func (g *Gateway) CreatePermissionAction(w http.ResponseWriter, r *http.Request)
 	ctx := r.Context()
 	le := getLogger(r)
 
-	username, ok := ctx.Value("username").(string)
+	authenticatedUsername, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, username) != "superuser" {
+	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
 		le.Warn("access forbidden")
 		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
@@ -102,7 +102,7 @@ func (g *Gateway) CreatePermissionAction(w http.ResponseWriter, r *http.Request)
 	perm := &types.Permission{
 		Name:        r.PostFormValue("perm"),
 		Description: r.PostFormValue("descr"),
-		CreatedBy:   username,
+		CreatedBy:   authenticatedUsername,
 	}
 
 	err := repository.CreatePermission(le, g.aerospikeClient, perm)
@@ -111,10 +111,15 @@ func (g *Gateway) CreatePermissionAction(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	pc := PermissionCreated{
-		Name: perm.Name,
+	notice := Notice{
+		Title:   "New permission",
+		Message: fmt.Sprintf("Permission \"%s\" created.", perm.Name),
 	}
-	executeTemplate(le, w, "permissioncreated.htm", pc)
+
+	// writing response
+	executeHeaderTemplate(le, w, authenticatedUsername)
+
+	executeTemplate(le, w, "notice.htm", notice)
 
 	executeFooterTemplate(le, w)
 
