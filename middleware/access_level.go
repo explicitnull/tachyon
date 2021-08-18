@@ -29,7 +29,7 @@ func (m *Middleware) CheckAccessLevel(next http.Handler) http.Handler {
 
 		switch level {
 		case "level1":
-			if (r.URL.Path == "/") || (r.URL.Path == "/myaccount/") || (r.URL.Path == "/lockout/") || (r.URL.Path == "/logout/") {
+			if (r.URL.Path == "/") || (r.URL.Path == "/myaccount/") || (r.URL.Path == "/lockout/") || (r.URL.Path == "/logout/") || (r.URL.Path == "/equipment/") {
 				next.ServeHTTP(w, r)
 			} else {
 				le.Warn("access forbidden")
