@@ -63,13 +63,18 @@ func main() {
 		log.Fatalf("middleware init failed: %v", err)
 	}
 
+	// login router
+	rl := mux.NewRouter()
+	rl.HandleFunc("/login/", g.Login).Methods("GET")
+	rl.HandleFunc("/login/", g.LoginAction).Methods("POST")
+
+	rl.Use(m.Log)
+
+	http.Handle("/login/", rl)
+
+	// main router
 	r := mux.NewRouter()
 	r.HandleFunc("/", g.Index).Methods("GET")
-	r.HandleFunc("/login/", g.Login).Methods("GET")
-	r.HandleFunc("/login/", g.LoginAction).Methods("POST")
-	r.HandleFunc("/logout/", g.Logout).Methods("GET")
-
-	// tacplus configuration management handlers
 
 	r.HandleFunc("/myaccount/", g.ChangePassword).Methods("GET")
 	r.HandleFunc("/myaccount/", g.ChangePasswordAction).Methods("POST")
@@ -92,26 +97,24 @@ func main() {
 
 	r.HandleFunc("/equipment/", g.ShowEquipment).Methods("GET")
 
-	// tacplus logs handlers
-
 	r.HandleFunc("/auth/", g.ShowAuthentication).Methods("GET")
 	r.HandleFunc("/auth_search/", g.SearchAuthentication).Methods("POST")
-
 	r.HandleFunc("/acct/", g.ShowAccounting).Methods("GET")
 	r.HandleFunc("/acct-search/", g.SearchAccounting).Methods("POST")
 
-	// antibruteforce handler
 	r.HandleFunc("/lockout/", g.ShowLockouts)
 
 	r.HandleFunc("/settings/", g.ShowOptions).Methods("GET")
 
-	r.Use(m.Log)
-	r.Use(m.CheckCookie)
+	r.HandleFunc("/logout/", g.Logout).Methods("GET")
+
+	r.Use(m.Log, m.CheckCookie, m.CheckAccessLevel)
+
+	http.Handle("/", r)
 
 	// TODO: move serving assets to standalone proxy like nginx
 	http.Handle("/assets/", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	serveSingle("/favicon.ico", "assets/favicon.ico")
-	http.Handle("/", r)
 
 	// server
 	// TODO: move port to conf

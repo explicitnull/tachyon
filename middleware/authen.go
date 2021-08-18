@@ -15,12 +15,6 @@ func (m *Middleware) CheckCookie(next http.Handler) http.Handler {
 			WithField("origin", "middleware").
 			WithField("requestID", ctx.Value("requestID"))
 
-		if r.URL.Path == "/login/" {
-			le.Debug("middleware: bypassing cookie check for login page")
-			next.ServeHTTP(w, r)
-			return
-		}
-
 		username, ok := checkCookie(r, m.sc, le)
 		if ok {
 			le.WithField("username", username).Debugf("cookie verified")
