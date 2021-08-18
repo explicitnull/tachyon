@@ -132,7 +132,8 @@ func cookieInit(hashKey, blockKey []byte) *securecookie.SecureCookie {
 func loggingInit() {
 	log.SetFormatter(&log.JSONFormatter{})
 	log.SetOutput(os.Stdout)
-	log.SetLevel(log.InfoLevel)
+	// log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 }
 
 func serveSingle(pattern string, filename string) {

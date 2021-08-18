@@ -29,7 +29,7 @@ func (m *Middleware) CheckAccessLevel(next http.Handler) http.Handler {
 
 		switch level {
 		case "level1":
-			if (r.URL.Path == "/") || (r.URL.Path == "/myaccount/") {
+			if (r.URL.Path == "/") || (r.URL.Path == "/myaccount/") || (r.URL.Path == "/lockout/") {
 				next.ServeHTTP(w, r)
 			} else {
 				le.Warn("access forbidden")
@@ -44,6 +44,8 @@ func (m *Middleware) CheckAccessLevel(next http.Handler) http.Handler {
 			}
 		case "level3":
 			next.ServeHTTP(w, r)
+		default:
+			le.Error("unknown access level received from database")
 		}
 	})
 }
