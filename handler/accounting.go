@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"tacacs-webconsole/applogic"
-	"tacacs-webconsole/repository"
 	"tacacs-webconsole/types"
 	"time"
 )
@@ -18,12 +17,6 @@ func (g *Gateway) ShowAccounting(w http.ResponseWriter, r *http.Request) {
 	authenticatedUsername, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		return
-	}
-
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
 	}
 
@@ -64,13 +57,6 @@ func (g *Gateway) SearchAccounting(w http.ResponseWriter, r *http.Request) {
 		le.Warn("no username in context")
 		return
 	}
-
-	// if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" ||
-	// 	repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "manager" {
-	// 	le.Warn("access forbidden")
-	// 	http.Error(w, "access forbidden", http.StatusForbidden)
-	// 	return
-	// }
 
 	field := r.PostFormValue("fld")
 	value := r.PostFormValue("val")

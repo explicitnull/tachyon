@@ -24,12 +24,6 @@ func (g *Gateway) ShowPermissions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
-		return
-	}
-
 	items, _ := repository.GetPermissions(le, g.aerospikeClient)
 
 	perms := &types.Permissions{
@@ -67,12 +61,6 @@ func (g *Gateway) CreatePermission(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, username) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
-		return
-	}
-
 	executeHeaderTemplate(le, w, username)
 
 	executeTemplate(le, w, "permission_new.htm", nil)
@@ -89,12 +77,6 @@ func (g *Gateway) CreatePermissionAction(w http.ResponseWriter, r *http.Request)
 	authenticatedUsername, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		return
-	}
-
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
 	}
 
@@ -136,12 +118,6 @@ func (g *Gateway) EditPermission(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
-		return
-	}
-
 	// parsing request
 	vars := mux.Vars(r)
 	name, ok := vars["name"]
@@ -176,12 +152,6 @@ func (g *Gateway) EditPermissionAction(w http.ResponseWriter, r *http.Request) {
 	authenticatedUsername, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		return
-	}
-
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, accessForbidden, http.StatusForbidden)
 		return
 	}
 

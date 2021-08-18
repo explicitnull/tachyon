@@ -58,7 +58,7 @@ func main() {
 	}
 
 	// middleware
-	m, err := middleware.NewMiddleware(appOptions, sCookie)
+	m, err := middleware.NewMiddleware(appOptions, sCookie, aerospikeClient)
 	if err != nil {
 		log.Fatalf("middleware init failed: %v", err)
 	}

@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"tacacs-webconsole/options"
 
+	"github.com/aerospike/aerospike-client-go"
 	"github.com/gorilla/securecookie"
 )
 
@@ -13,12 +14,14 @@ type Middleware struct {
 	appVersion string
 	Options    *options.Options
 	sc         *securecookie.SecureCookie
+	asClient   *aerospike.Client
 }
 
-func NewMiddleware(o *options.Options, sc *securecookie.SecureCookie) (*Middleware, error) {
+func NewMiddleware(o *options.Options, sc *securecookie.SecureCookie, asClient *aerospike.Client) (*Middleware, error) {
 	return &Middleware{
-		Options: o,
-		sc:      sc,
+		Options:  o,
+		sc:       sc,
+		asClient: asClient,
 	}, nil
 }
 

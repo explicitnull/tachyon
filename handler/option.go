@@ -16,12 +16,6 @@ func (g *Gateway) ShowOptions(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
-		return
-	}
-
 	o, err := repository.GetOptions(le, g.aerospikeClient)
 	if err != nil {
 		le.WithError(err).Error("getting options failed")
@@ -57,12 +51,6 @@ func (g *Gateway) ShowOptions(w http.ResponseWriter, r *http.Request) {
 // 	authenticatedUsername, ok := ctx.Value("username").(string)
 // 	if !ok {
 // 		le.Warn("no username in context")
-// 		return
-// 	}
-
-// 	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-// 		le.Warn("access forbidden")
-// 		http.Error(w, accessForbidden, http.StatusForbidden)
 // 		return
 // 	}
 

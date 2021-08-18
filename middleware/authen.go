@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/securecookie"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 func (m *Middleware) CheckCookie(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		le := log.
+		le := logrus.
 			WithField("origin", "middleware").
 			WithField("requestID", ctx.Value("requestID"))
 
@@ -36,7 +36,7 @@ func (m *Middleware) CheckCookie(next http.Handler) http.Handler {
 	})
 }
 
-func checkCookie(r *http.Request, sc *securecookie.SecureCookie, le *log.Entry) (string, bool) {
+func checkCookie(r *http.Request, sc *securecookie.SecureCookie, le *logrus.Entry) (string, bool) {
 	cookie, err := r.Cookie("username")
 	if err != nil {
 		return "", false

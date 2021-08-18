@@ -22,12 +22,6 @@ func (g *Gateway) ShowAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, username) == "none" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
-		return
-	}
-
 	items, err := repository.GetAccounts(le, g.aerospikeClient)
 	if err != nil {
 		le.WithError(err).Error("getting accounts failed")
@@ -93,12 +87,6 @@ func (g *Gateway) CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, username) != "superuser" {
-		le.Warn("access forbidden")
-		fmt.Fprintf(w, "access forbidden")
-		return
-	}
-
 	executeHeaderTemplate(le, w, username)
 
 	form := new(FormOptions)
@@ -119,12 +107,6 @@ func (g *Gateway) CreateUserAction(w http.ResponseWriter, r *http.Request) {
 	authenticatedUsername, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		return
-	}
-
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
 	}
 
@@ -173,12 +155,6 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, accessForbidden, http.StatusForbidden)
-		return
-	}
-
 	// parsing request
 	vars := mux.Vars(r)
 	name, ok := vars["name"]
@@ -217,12 +193,6 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 	authenticatedUsername, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		return
-	}
-
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
 	}
 
@@ -274,12 +244,6 @@ func (g *Gateway) RemoveAccount(w http.ResponseWriter, r *http.Request) {
 	authenticatedUsername, ok := ctx.Value("username").(string)
 	if !ok {
 		le.Warn("no username in context")
-		return
-	}
-
-	if repository.GetRole(le, g.aerospikeClient, authenticatedUsername) != "superuser" {
-		le.Warn("access forbidden")
-		http.Error(w, "access forbidden", http.StatusForbidden)
 		return
 	}
 
