@@ -31,7 +31,7 @@ func GetAccessLevel(le *logrus.Entry, aclient *aerospike.Client, username string
 		return "", err
 	}
 
-	le.Debugf("access level: %s", level)
+	le.Debugf("access level - %s", level)
 
 	return level, nil
 }
