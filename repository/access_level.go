@@ -16,7 +16,7 @@ func GetAccessLevel(le *logrus.Entry, aclient *aerospike.Client, username string
 
 	policy := aerospike.NewPolicy()
 
-	rec, err := aclient.Get(policy, key, "ui_role")
+	rec, err := aclient.Get(policy, key, "ui_level")
 	if err != nil {
 		le.WithError(err).Error("aerospike query failed")
 		return "", err
@@ -26,7 +26,7 @@ func GetAccessLevel(le *logrus.Entry, aclient *aerospike.Client, username string
 		return "", errors.New("aerospike record not found")
 	}
 
-	level, err := extractString(rec.Bins, "ui_role")
+	level, err := extractString(rec.Bins, "ui_level")
 	if err != nil {
 		return "", err
 	}

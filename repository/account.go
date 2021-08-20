@@ -1,5 +1,5 @@
 // insert into tacacs.users (PK, id, username, pass, subdiv_id, permis_id, mail, status, created_ts, created_by, pass_set_ts) values ('furai', 'QgYhMfWWaLqg', 'furai', 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg', 2, 10, 'dmitry.zhargalov@rt.ru', 'pass_not_chd', '2021-01-01 18:00', 'superuser', '')
-// insert into tacacs.users (PK, id, username, pass, subdiv_id, permis_id, mail, status, created_ts, created_by, pass_chd_ts, ui_role) values ('test09', 'srC4Is0V1sFb', 'test09', 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg', 2, 10, 'anton.moroz@rt.ru', 'suspended', '2009-01-02 18:00', 'furai', '2021-07-01 13:00', "manager")
+// insert into tacacs.users (PK, id, username, pass, subdiv_id, permis_id, mail, status, created_ts, created_by, pass_chd_ts, ui_level) values ('test09', 'srC4Is0V1sFb', 'test09', 'n4bQgYhMfWWaL+qgxVrQFaO/TxsrC4Is0V1sFbDwCgg', 2, 10, 'anton.moroz@rt.ru', 'suspended', '2009-01-02 18:00', 'furai', '2021-07-01 13:00', "manager")
 package repository
 
 import (
@@ -193,8 +193,8 @@ func SetMail(le *logrus.Entry, aclient *aerospike.Client, acname string, mail st
 	return nil
 }
 
-func SetUIRole(le *logrus.Entry, aclient *aerospike.Client, acname string, role string) error {
-	err := setBinString(aclient, accountsSet, acname, "ui_role", role)
+func SetUILevel(le *logrus.Entry, aclient *aerospike.Client, acname string, role string) error {
+	err := setBinString(aclient, accountsSet, acname, "ui_level", role)
 	if err != nil {
 		return err
 	}
@@ -252,7 +252,7 @@ func extractAccount(bins aerospike.BinMap) (*types.Account, error) {
 		return nil, err
 	}
 
-	uiRole, err := extractString(bins, "ui_role")
+	uiLevel, err := extractString(bins, "ui_level")
 	if err != nil {
 		return nil, err
 	}
@@ -266,7 +266,7 @@ func extractAccount(bins aerospike.BinMap) (*types.Account, error) {
 		CreatedTimestamp:         createdTimestamp,
 		Status:                   status,
 		PasswordChangedTimestamp: passwordChangedTimestamp,
-		UIRole:                   uiRole,
+		UILevel:                  uiLevel,
 	}
 
 	return acc, nil

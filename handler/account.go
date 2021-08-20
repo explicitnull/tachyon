@@ -213,7 +213,7 @@ func (g *Gateway) EditAccountAction(w http.ResponseWriter, r *http.Request) {
 		Permission:  r.PostFormValue("perm"),
 		Mail:        r.PostFormValue("m"),
 		Status:      r.PostFormValue("status"),
-		UIRole:      r.PostFormValue("ui_role"),
+		UILevel:     r.PostFormValue("ui_level"),
 	}
 
 	err := applogic.EditAccountAction(le, g.aerospikeClient, fac)

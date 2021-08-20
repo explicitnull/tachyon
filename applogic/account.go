@@ -164,8 +164,8 @@ func EditAccountAction(le *logrus.Entry, aclient *aerospike.Client, fac *types.A
 		}
 	}
 
-	if fac.UIRole != dbac.UIRole {
-		err = repository.SetUIRole(le, aclient, fac.Name, fac.UIRole)
+	if fac.UILevel != dbac.UILevel {
+		err = repository.SetUILevel(le, aclient, fac.Name, fac.UILevel)
 		if err != nil {
 			return err
 		}

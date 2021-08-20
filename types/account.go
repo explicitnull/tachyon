@@ -16,7 +16,7 @@ type Account struct {
 	CreatedBy                string
 	PasswordChangedTimestamp string // new
 	// LastSignedInTimestamp    string // new
-	UIRole string // new
+	UILevel string // new
 
 	SubdivisionID    int // new
 	PermissionID     int // new
