@@ -219,7 +219,7 @@ func SetMail(ctx context.Context, aclient *aerospike.Client, acname string, mail
 }
 
 func SetUILevel(ctx context.Context, aclient *aerospike.Client, acname string, role string) error {
-	err := setBinString(aclient, accountsSet, acname, "ui_level", role)
+	err := setBinString(aclient, accountsSet, acname, "ui_role", role)
 	if err != nil {
 		return err
 	}
@@ -277,7 +277,7 @@ func extractAccount(bins aerospike.BinMap) (*types.Account, error) {
 		return nil, err
 	}
 
-	uiLevel, err := extractString(bins, "ui_level")
+	uiLevel, err := extractString(bins, "ui_role")
 	if err != nil {
 		return nil, err
 	}
