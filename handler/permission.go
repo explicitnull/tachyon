@@ -3,9 +3,9 @@ package handler
 import (
 	"fmt"
 	"net/http"
-	"tacacs-webconsole/applogic"
-	"tacacs-webconsole/repository"
-	"tacacs-webconsole/types"
+	"tachyon/applogic"
+	"tachyon/repository"
+	"tachyon/types"
 
 	"github.com/gorilla/mux"
 )

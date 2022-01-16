@@ -3,7 +3,7 @@ package middleware
 import (
 	"context"
 	"net/http"
-	"tacacs-webconsole/options"
+	"tachyon/options"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/gorilla/securecookie"

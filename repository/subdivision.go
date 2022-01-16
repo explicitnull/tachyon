@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"tacacs-webconsole/types"
+	"tachyon/types"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"

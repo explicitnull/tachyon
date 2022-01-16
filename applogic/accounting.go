@@ -1,8 +1,8 @@
 package applogic
 
 import (
-	"tacacs-webconsole/repository"
-	"tacacs-webconsole/types"
+	"tachyon/repository"
+	"tachyon/types"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go"

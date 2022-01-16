@@ -2,8 +2,8 @@ package handler
 
 import (
 	"net/http"
-	"tacacs-webconsole/repository"
-	"tacacs-webconsole/types"
+	"tachyon/repository"
+	"tachyon/types"
 )
 
 func (g *Gateway) ShowEquipment(w http.ResponseWriter, r *http.Request) {

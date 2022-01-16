@@ -8,9 +8,9 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"tacacs-webconsole/options"
-	"tacacs-webconsole/repository"
-	"tacacs-webconsole/types"
+	"tachyon/options"
+	"tachyon/repository"
+	"tachyon/types"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/dchest/uniuri"

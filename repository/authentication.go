@@ -2,7 +2,7 @@
 package repository
 
 import (
-	"tacacs-webconsole/types"
+	"tachyon/types"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go"

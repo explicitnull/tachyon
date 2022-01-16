@@ -2,7 +2,7 @@ package applogic
 
 import (
 	"context"
-	"tacacs-webconsole/repository"
+	"tachyon/repository"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"

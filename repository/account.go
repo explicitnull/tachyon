@@ -7,7 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
-	"tacacs-webconsole/types"
+	"tachyon/types"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go"
@@ -107,6 +107,34 @@ func GetPasswordHash(ctx context.Context, client *aerospike.Client, username str
 	}
 
 	return "", nil
+}
+
+// GetAccessLevel checks if user can see or change tacplus configuration
+func GetAccessLevel(ctx context.Context, aclient *aerospike.Client, username string) (string, error) {
+	key, err := aerospike.NewKey(namespace, accountsSet, username)
+	if err != nil {
+		return "", err
+	}
+
+	policy := aerospike.NewPolicy()
+
+	rec, err := aclient.Get(policy, key, "ui_role")
+	if err != nil {
+		return "", fmt.Errorf("aerospike query failed: %v", err)
+	}
+
+	if rec == nil {
+		return "", errors.New("aerospike record not found")
+	}
+
+	level, err := extractString(rec.Bins, "ui_role")
+	if err != nil {
+		return "", err
+	}
+
+	// le.Debugf("access level - %s", level)
+
+	return level, nil
 }
 
 func CreateUser(ctx context.Context, client *aerospike.Client, username, hash, mail, createdBy string, permisID, subdivID int) error {

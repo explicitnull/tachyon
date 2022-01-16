@@ -3,9 +3,9 @@ package main
 import (
 	"net/http"
 	"os"
-	"tacacs-webconsole/handler"
-	"tacacs-webconsole/middleware"
-	"tacacs-webconsole/options"
+	"tachyon/handler"
+	"tachyon/middleware"
+	"tachyon/options"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/gorilla/mux"
@@ -13,7 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const appName = "tacacs-webconsole"
+const appName = "tachyon"
 
 // TODO: move to env
 var (

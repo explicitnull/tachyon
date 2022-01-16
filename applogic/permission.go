@@ -1,8 +1,8 @@
 package applogic
 
 import (
-	"tacacs-webconsole/repository"
-	"tacacs-webconsole/types"
+	"tachyon/repository"
+	"tachyon/types"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/sirupsen/logrus"

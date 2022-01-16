@@ -6,7 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"os/exec"
-	"tacacs-webconsole/applogic"
+	"tachyon/applogic"
 	"time"
 
 	"github.com/gorilla/securecookie"

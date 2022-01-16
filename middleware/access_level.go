@@ -2,7 +2,7 @@ package middleware
 
 import (
 	"net/http"
-	"tacacs-webconsole/repository"
+	"tachyon/repository"
 
 	"github.com/sirupsen/logrus"
 )
@@ -20,7 +20,7 @@ func (m *Middleware) CheckAccessLevel(next http.Handler) http.Handler {
 			return
 		}
 
-		level, err := repository.GetAccessLevel(le, m.asClient, username)
+		level, err := repository.GetAccessLevel(ctx, m.asClient, username)
 		if err != nil {
 			le.WithError(err).Error("getting access level failure")
 			http.Error(w, "server error", http.StatusInternalServerError)

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"tacacs-webconsole/options"
+	"tachyon/options"
 
 	"github.com/aerospike/aerospike-client-go"
 
@@ -18,7 +18,7 @@ type Gateway struct {
 
 func NewGateway(o *options.Options, aerospikeClient *aerospike.Client, sc *securecookie.SecureCookie) (*Gateway, error) {
 	return &Gateway{
-		appName:         "tacacs-webconsole",
+		appName:         "tachyon",
 		appVersion:      "1.0.0",
 		Options:         o,
 		aerospikeClient: aerospikeClient,

@@ -1,4 +1,4 @@
-module tacacs-webconsole
+module tachyon
 
 go 1.16
 
