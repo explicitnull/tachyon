@@ -1,6 +1,7 @@
 package applogic
 
 import (
+	"context"
 	"tacacs-webconsole/repository"
 
 	"github.com/aerospike/aerospike-client-go"
@@ -8,7 +9,8 @@ import (
 )
 
 func LoginAction(le *logrus.Entry, username, formPassword string, aClient *aerospike.Client) bool {
-	dbhash, err := repository.GetPasswordHash(le, aClient, username)
+	ctx := context.TODO()
+	dbhash, err := repository.GetPasswordHash(ctx, aClient, username)
 	if err != nil {
 		le.WithError(err).Errorf("GetPasswordHash() failed")
 		return false

@@ -22,7 +22,7 @@ func (g *Gateway) ShowAccounts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, err := repository.GetAccounts(le, g.aerospikeClient)
+	items, err := repository.GetAccounts(ctx, g.aerospikeClient)
 	if err != nil {
 		le.WithError(err).Error("getting accounts failed")
 		http.Error(w, "internal error", http.StatusInternalServerError)
@@ -165,7 +165,7 @@ func (g *Gateway) EditAccount(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// getting account data from DB
-	acc, err := repository.GetAccountByName(le, g.aerospikeClient, name)
+	acc, err := repository.GetAccountByName(ctx, g.aerospikeClient, name)
 	if err != nil {
 		le.WithError(err).Error("getting account failed")
 		http.Error(w, serverError, http.StatusInternalServerError)

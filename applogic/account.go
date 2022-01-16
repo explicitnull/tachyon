@@ -1,6 +1,7 @@
 package applogic
 
 import (
+	"context"
 	"crypto/sha256"
 	"encoding/base64"
 	"errors"
@@ -23,6 +24,7 @@ var (
 )
 
 func CreateUserAction(le *logrus.Entry, aClient *aerospike.Client, req types.Account, authenticatedUsername string) (string, error) {
+	ctx := context.TODO()
 	// normalization
 	subdivID, err := repository.GetSubdivisionID(le, aClient, req.Subdivision)
 	if err != nil {
@@ -41,7 +43,7 @@ func CreateUserAction(le *logrus.Entry, aClient *aerospike.Client, req types.Acc
 	hash := MakeHash(le, cleartext)
 	le.Debug(hash)
 
-	err = repository.CreateUser(le, aClient, req.Name, hash, req.Mail, authenticatedUsername, permisID, subdivID)
+	err = repository.CreateUser(ctx, aClient, req.Name, hash, req.Mail, authenticatedUsername, permisID, subdivID)
 	if err != nil {
 		le.WithError(err).Errorf("error creating user")
 		return "", err
@@ -74,7 +76,8 @@ func ChangePasswordAction(le *logrus.Entry, aclient *aerospike.Client, authentic
 	// changing password
 	hash := MakeHash(le, pass)
 
-	err := repository.SetPassword(le, aclient, authenticatedUsername, hash)
+	ctx := context.TODO()
+	err := repository.SetPassword(ctx, aclient, authenticatedUsername, hash)
 	if err != nil {
 		le.WithError(err).Error("password update failed")
 		return err
@@ -98,7 +101,7 @@ func ChangePasswordAction(le *logrus.Entry, aclient *aerospike.Client, authentic
 	*/
 
 	// activating user
-	err = repository.SetAccountStatus(le, aclient, authenticatedUsername, "active")
+	err = repository.SetAccountStatus(ctx, aclient, authenticatedUsername, "active")
 	if err != nil {
 		le.WithError(err).Error("user activation failed")
 		return err
@@ -111,7 +114,8 @@ func ChangePasswordAction(le *logrus.Entry, aclient *aerospike.Client, authentic
 
 func EditAccountAction(le *logrus.Entry, aclient *aerospike.Client, fac *types.Account) error {
 	// getting account data from DB
-	dbac, err := repository.GetAccountByName(le, aclient, fac.Name)
+	ctx := context.TODO()
+	dbac, err := repository.GetAccountByName(ctx, aclient, fac.Name)
 	if err != nil {
 		le.WithError(err).Error("getting account failed")
 		return err
@@ -120,7 +124,7 @@ func EditAccountAction(le *logrus.Entry, aclient *aerospike.Client, fac *types.A
 	// applying changes
 	if fac.Cleartext != "" {
 		hash := MakeHash(le, fac.Cleartext)
-		err = repository.SetPassword(le, aclient, fac.Name, hash)
+		err = repository.SetPassword(ctx, aclient, fac.Name, hash)
 		if err != nil {
 			return err
 		}
@@ -132,7 +136,7 @@ func EditAccountAction(le *logrus.Entry, aclient *aerospike.Client, fac *types.A
 			return err
 		}
 
-		err = repository.SetSubdivision(le, aclient, fac.Name, subdivID)
+		err = repository.SetSubdivision(ctx, aclient, fac.Name, subdivID)
 		if err != nil {
 			return err
 		}
@@ -144,28 +148,28 @@ func EditAccountAction(le *logrus.Entry, aclient *aerospike.Client, fac *types.A
 			return err
 		}
 
-		err = repository.SetPermission(le, aclient, fac.Name, permisID)
+		err = repository.SetPermission(ctx, aclient, fac.Name, permisID)
 		if err != nil {
 			return err
 		}
 	}
 
 	if fac.Mail != "" && fac.Mail != dbac.Mail {
-		err = repository.SetMail(le, aclient, fac.Name, fac.Mail)
+		err = repository.SetMail(ctx, aclient, fac.Name, fac.Mail)
 		if err != nil {
 			return err
 		}
 	}
 
 	if fac.Status != dbac.Status {
-		err = repository.SetAccountStatus(le, aclient, fac.Name, fac.Status)
+		err = repository.SetAccountStatus(ctx, aclient, fac.Name, fac.Status)
 		if err != nil {
 			return err
 		}
 	}
 
 	if fac.UILevel != dbac.UILevel {
-		err = repository.SetUILevel(le, aclient, fac.Name, fac.UILevel)
+		err = repository.SetUILevel(ctx, aclient, fac.Name, fac.UILevel)
 		if err != nil {
 			return err
 		}
@@ -175,7 +179,8 @@ func EditAccountAction(le *logrus.Entry, aclient *aerospike.Client, fac *types.A
 }
 
 func RemoveAccount(le *logrus.Entry, aclient *aerospike.Client, acname, authenticatedUsername string) error {
-	err := repository.DeleteAccount(le, aclient, acname, authenticatedUsername)
+	ctx := context.TODO()
+	err := repository.DeleteAccount(ctx, aclient, acname, authenticatedUsername)
 	if err != nil {
 		return nil
 	}

@@ -3,22 +3,23 @@
 package repository
 
 import (
+	"context"
 	"errors"
+	"fmt"
 	"strconv"
 	"tacacs-webconsole/types"
 	"time"
 
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/dchest/uniuri"
-	"github.com/sirupsen/logrus"
 )
 
 const (
 	accountsSet = "users"
 )
 
-func GetAccounts(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Account, error) {
-	begin := time.Now()
+func GetAccounts(ctx context.Context, aclient *aerospike.Client) ([]*types.Account, error) {
+	// begin := time.Now()
 
 	recs, err := getAllRecords(aclient, accountsSet)
 	if err != nil {
@@ -30,21 +31,20 @@ func GetAccounts(le *logrus.Entry, aclient *aerospike.Client) ([]*types.Account,
 	for _, v := range recs {
 		acc, err := extractAccount(v.Bins)
 		if err != nil {
-			le.WithError(err).Error("extracting bins failed")
-			return nil, err
+			return nil, fmt.Errorf("extracting bins failed: %v", err)
 		}
 
 		result = append(result, acc)
 	}
 
-	end := time.Now()
-	seconds := float64(end.Sub(begin)) / float64(time.Second)
-	le.Debug("Elapsed time: ", seconds, " seconds")
+	// end := time.Now()
+	// seconds := float64(end.Sub(begin)) / float64(time.Second)
+	// le.Debug("Elapsed time: ", seconds, " seconds")
 
 	return result, nil
 }
 
-func GetAccountByName(le *logrus.Entry, client *aerospike.Client, name string) (*types.Account, error) {
+func GetAccountByName(ctx context.Context, client *aerospike.Client, name string) (*types.Account, error) {
 	var key *aerospike.Key
 
 	skey := name
@@ -58,8 +58,7 @@ func GetAccountByName(le *logrus.Entry, client *aerospike.Client, name string) (
 
 	rec, err := client.Get(policy, key)
 	if err != nil {
-		le.WithError(err).Error("aerospike query failed")
-		return nil, err
+		return nil, fmt.Errorf("aerospike query failed: %v", err)
 	}
 
 	if rec == nil {
@@ -69,15 +68,14 @@ func GetAccountByName(le *logrus.Entry, client *aerospike.Client, name string) (
 
 	acc, err := extractAccount(rec.Bins)
 	if err != nil {
-		le.WithError(err).Error("extracting bins failed")
-		return nil, err
+		return nil, fmt.Errorf("extracting bins failed: %v", err)
 	}
 
 	return acc, nil
 }
 
 // GetPasswordHash searches for password hash of given user
-func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string) (string, error) {
+func GetPasswordHash(ctx context.Context, client *aerospike.Client, username string) (string, error) {
 	var key *aerospike.Key
 
 	skey := username
@@ -97,8 +95,7 @@ func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string
 
 	rec, err := client.Get(policy, key, "pass")
 	if err != nil {
-		le.WithError(err).Error("aerospike query failed")
-		return "", err
+		return "", fmt.Errorf("aerospike query failed: %v", err)
 	}
 
 	if rec != nil {
@@ -112,7 +109,7 @@ func GetPasswordHash(le *logrus.Entry, client *aerospike.Client, username string
 	return "", nil
 }
 
-func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail, createdBy string, permisID, subdivID int) error {
+func CreateUser(ctx context.Context, client *aerospike.Client, username, hash, mail, createdBy string, permisID, subdivID int) error {
 	var key *aerospike.Key
 
 	skey := username
@@ -144,12 +141,12 @@ func CreateUser(le *logrus.Entry, client *aerospike.Client, username, hash, mail
 		return err
 	}
 
-	le.Debugf("record inserted: namespace=%s accountsSet=%s key=%v", key.Namespace(), key.SetName(), key.Value())
+	// le.Debugf("record inserted: namespace=%s accountsSet=%s key=%v", key.Namespace(), key.SetName(), key.Value())
 
 	return nil
 }
 
-func SetPassword(le *logrus.Entry, aclient *aerospike.Client, acname, hash string) error {
+func SetPassword(ctx context.Context, aclient *aerospike.Client, acname, hash string) error {
 	err := setBinString(aclient, accountsSet, acname, "pass", hash)
 	if err != nil {
 		return err
@@ -157,7 +154,7 @@ func SetPassword(le *logrus.Entry, aclient *aerospike.Client, acname, hash strin
 	return nil
 }
 
-func SetAccountStatus(le *logrus.Entry, aclient *aerospike.Client, acname string, status string) error {
+func SetAccountStatus(ctx context.Context, aclient *aerospike.Client, acname string, status string) error {
 	err := setBinString(aclient, accountsSet, acname, "status", status)
 	if err != nil {
 		return err
@@ -166,7 +163,7 @@ func SetAccountStatus(le *logrus.Entry, aclient *aerospike.Client, acname string
 	return nil
 }
 
-func SetSubdivision(le *logrus.Entry, aclient *aerospike.Client, acname string, subdiv int) error {
+func SetSubdivision(ctx context.Context, aclient *aerospike.Client, acname string, subdiv int) error {
 	err := setBinInt(aclient, accountsSet, acname, "subdiv_id", subdiv)
 	if err != nil {
 		return err
@@ -175,7 +172,7 @@ func SetSubdivision(le *logrus.Entry, aclient *aerospike.Client, acname string, 
 	return nil
 }
 
-func SetPermission(le *logrus.Entry, aclient *aerospike.Client, acname string, perm int) error {
+func SetPermission(ctx context.Context, aclient *aerospike.Client, acname string, perm int) error {
 	err := setBinInt(aclient, accountsSet, acname, "permis_id", perm)
 	if err != nil {
 		return err
@@ -184,7 +181,7 @@ func SetPermission(le *logrus.Entry, aclient *aerospike.Client, acname string, p
 	return nil
 }
 
-func SetMail(le *logrus.Entry, aclient *aerospike.Client, acname string, mail string) error {
+func SetMail(ctx context.Context, aclient *aerospike.Client, acname string, mail string) error {
 	err := setBinString(aclient, accountsSet, acname, "mail", mail)
 	if err != nil {
 		return err
@@ -193,7 +190,7 @@ func SetMail(le *logrus.Entry, aclient *aerospike.Client, acname string, mail st
 	return nil
 }
 
-func SetUILevel(le *logrus.Entry, aclient *aerospike.Client, acname string, role string) error {
+func SetUILevel(ctx context.Context, aclient *aerospike.Client, acname string, role string) error {
 	err := setBinString(aclient, accountsSet, acname, "ui_level", role)
 	if err != nil {
 		return err
@@ -202,7 +199,7 @@ func SetUILevel(le *logrus.Entry, aclient *aerospike.Client, acname string, role
 	return nil
 }
 
-func DeleteAccount(le *logrus.Entry, aclient *aerospike.Client, acname, authenticatedUsername string) error {
+func DeleteAccount(ctx context.Context, aclient *aerospike.Client, acname, authenticatedUsername string) error {
 	_, err := deleteRecord(aclient, accountsSet, acname)
 	if err != nil {
 		return err
