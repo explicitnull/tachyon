@@ -1,0 +1,30 @@
+userVariables:
+  - question: Введите краткое описание микросервиса, для файла README.md
+    variable: BS_README_SHORT
+  - question: "Введите имя и фамилию мейнтейнера, например: Иван Иванов"
+    variable: BS_MAINTAINER_NAME
+  - question: "Введите email мейнтейнера, например: ivanov.i@mail.ru"
+    variable: BS_MAINTAINER_EMAIL
+
+instruction: |
+  *Правила оформления приложения*
+  1. Если нужны дополнительные опции, добавьте их в структуру Config
+
+  2. Все http-контроллеры должны располагаться в директории internal/http.
+
+  3. gRPC оформлять согласно https://confluence.citilink.ru/display/SPC/gRPC
+
+      Пример можно посмотреть в пакете blog
+      Удалите этот пакет прежде, чем передать приложение на Code Review
+
+  3. Посмотрите пример реализации метрик для Prometheus в файле metrics.go
+     и при необходимости добавьте свои.
+     Удалите метрику  *test_counter* прежде, чем передать приложение на Code Review.
+
+  4. Если ваше приложение долго инициализируется, измените реализацию контроллера
+     K8sController, чтобы метод HandleLivenessProbe() возвращал код, отличный от
+     200, если приложение не готово принимать запросы.
+
+  5. Найдите в коде все TODO комментарии, они подскажут, что необходимо заменить или удалить
+
+  6. Пример gRPC-клиента можно посмотреть тут - https://code.citik.ru/projects/MIC/repos/grpc-demo-app/browse/client
